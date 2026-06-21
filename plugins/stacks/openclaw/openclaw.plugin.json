@@ -1,0 +1,52 @@
+{
+  "id": "stacks",
+  "name": "Stacks Plugin",
+  "description": "Stacks blockchain tools: balances, STX transfers, account history, stacking/PoX, BNS naming, Clarity contract calls, ALEX swaps, and bridging.",
+  "contracts": {
+    "tools": [
+      "stacks_get_balance",
+      "stacks_send_tokens",
+      "stacks_get_account_history",
+      "stacks_stacking_status",
+      "stacks_can_stack",
+      "stacks_stack",
+      "stacks_delegate_stx",
+      "stacks_revoke_delegate",
+      "stacks_resolve_name",
+      "stacks_lookup_address",
+      "stacks_get_name_price",
+      "stacks_transfer_name",
+      "stacks_contract_call",
+      "stacks_read_only_call",
+      "stacks_decode_cv",
+      "stacks_swap_quote",
+      "stacks_swap_execute",
+      "stacks_bridge_quote",
+      "stacks_bridge_initiate"
+    ]
+  },
+  "toolMetadata": {
+    "stacks_send_tokens": { "optional": true },
+    "stacks_stack": { "optional": true },
+    "stacks_delegate_stx": { "optional": true },
+    "stacks_revoke_delegate": { "optional": true },
+    "stacks_transfer_name": { "optional": true },
+    "stacks_contract_call": { "optional": true },
+    "stacks_swap_execute": { "optional": true },
+    "stacks_bridge_initiate": { "optional": true }
+  },
+  "activation": {
+    "onStartup": true
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "defaultNetwork": {
+        "type": "string",
+        "enum": ["mainnet", "testnet"],
+        "default": "mainnet"
+      }
+    }
+  }
+}
