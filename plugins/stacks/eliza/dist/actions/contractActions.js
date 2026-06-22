@@ -1,15 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.contractActions = void 0;
-const agent_core_1 = require("@stacks/agent-core");
+const agent_core_1 = require("@sugarhi11/agent-core");
 const shared_1 = require("../shared");
 exports.contractActions = [
     (0, shared_1.makeAction)({
         name: 'stacks_contract_call',
         description: 'Sign and broadcast a public Clarity contract function call. ' +
-            'Params: { contractAddress, contractName, functionName, functionArgsHex?, senderKey, network? }.',
+            'Params: { contractAddress, contractName, functionName, functionArgsHex?, network? }. senderKey is auto-injected.',
         similes: ['CALL_CONTRACT', 'CONTRACT_CALL', 'CLARITY_CALL'],
         handler: agent_core_1.contractCall,
+        signed: true,
     }),
     (0, shared_1.makeAction)({
         name: 'stacks_read_only_call',

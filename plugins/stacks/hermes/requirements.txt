@@ -1,3 +1,6 @@
-httpx>=0.27.0
-# Optional: required only for write operations (signing/broadcasting transactions).
-# stacks-transactions>=0.1.0
+# Hermes Stacks plugin — Python runtime has no required pip deps.
+# Write and read tools delegate to @sugarhi11/agent-core via Node.js.
+#
+# Prerequisites:
+#   - Node.js 22+
+#   - npm install in plugins/stacks/hermes/

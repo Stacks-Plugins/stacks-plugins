@@ -1,7 +1,7 @@
 import type { Action } from '@elizaos/core';
 export type ToolHandler = (params: any) => Promise<any> | any;
 export interface ToolActionSpec {
-    /** Tool id from @stacks/agent-core, e.g. `stacks_get_balance`. */
+    /** Tool id from @sugarhi11/agent-core, e.g. `stacks_get_balance`. */
     name: string;
     /** Natural-language description shown to the model. */
     description: string;
@@ -11,9 +11,11 @@ export interface ToolActionSpec {
     handler: ToolHandler;
     /** Example conversations for the action. */
     examples?: any[];
+    /** Auto-inject STACKS_SENDER_KEY from env when omitted. */
+    signed?: boolean;
+    /** Convert `amount` from STX to microSTX before calling the handler. */
+    parseAmount?: boolean;
+    /** Format handler output for chat (defaults to JSON or custom per action). */
+    formatResult?: (result: unknown, params: Record<string, unknown>) => string;
 }
-/**
- * Convert a single @stacks/agent-core tool into an ElizaOS {@link Action}.
- * This keeps every adapter a thin shim over the shared implementation.
- */
 export declare function makeAction(spec: ToolActionSpec): Action;

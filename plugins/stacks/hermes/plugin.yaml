@@ -1,10 +1,33 @@
 name: stacks
-version: "0.1"
+version: "0.1.0"
 description: >-
   Stacks blockchain tools for Hermes agents: balances, account history,
-  stacking/PoX status, BNS naming, read-only Clarity calls, ALEX swap quotes,
-  and cross-chain bridge quotes. Write operations delegate to @stacks/agent-core
-  via a Node.js bridge (requires Node 22+ and STACKS_SENDER_KEY).
-requires_env:
-  - STACKS_NETWORK
-  - STACKS_SENDER_KEY
+  stacking/PoX, BNS naming, Clarity contracts, ALEX swaps, and bridging.
+  Read-only tools work out of the box; write tools require STACKS_SENDER_KEY.
+  All tools delegate to @sugarhi11/agent-core via a Node.js bridge
+  (requires Node 22+ and npm install in plugins/stacks/).
+author: NousResearch
+kind: standalone
+provides_tools:
+  - stacks_get_balance
+  - stacks_send_tokens
+  - stacks_get_account_history
+  - stacks_stacking_status
+  - stacks_can_stack
+  - stacks_stack
+  - stacks_delegate_stx
+  - stacks_revoke_delegate
+  - stacks_resolve_name
+  - stacks_lookup_address
+  - stacks_get_name_price
+  - stacks_transfer_name
+  - stacks_contract_call
+  - stacks_read_only_call
+  - stacks_decode_cv
+  - stacks_swap_quote
+  - stacks_swap_execute
+  - stacks_bridge_quote
+  - stacks_bridge_initiate
+provides_hooks:
+  - pre_llm_call
+  - post_tool_call

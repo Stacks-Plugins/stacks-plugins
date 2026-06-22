@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Hermes write-bridge: delegates signing/broadcasting to @stacks/agent-core
+ * Hermes write-bridge: delegates signing/broadcasting to @sugarhi11/agent-core
  * so Python handlers stay thin and match ElizaOS / OpenClaw behavior.
  *
  * Usage:
@@ -17,9 +17,9 @@ const require = createRequire(import.meta.url);
 
 let core;
 try {
-  core = require('@stacks/agent-core');
+  core = require('@sugarhi11/agent-core');
 } catch (err) {
-  emit({ success: false, error: `Failed to load @stacks/agent-core: ${err.message}. Run npm install && npm run build -w @stacks/agent-core` });
+  emit({ success: false, error: `Failed to load @sugarhi11/agent-core: ${err.message}. Run npm install in plugins/stacks/hermes (or npm install @sugarhi11/agent-core).` });
   process.exit(1);
 }
 

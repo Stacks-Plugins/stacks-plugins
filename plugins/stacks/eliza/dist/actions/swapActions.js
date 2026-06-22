@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.swapActions = void 0;
-const agent_core_1 = require("@stacks/agent-core");
+const agent_core_1 = require("@sugarhi11/agent-core");
 const shared_1 = require("../shared");
 exports.swapActions = [
     (0, shared_1.makeAction)({

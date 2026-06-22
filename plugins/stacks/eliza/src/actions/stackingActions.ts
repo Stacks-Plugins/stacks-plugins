@@ -4,7 +4,7 @@ import {
   getStackingStatus,
   revokeDelegate,
   stack,
-} from '@stacks/agent-core';
+} from '@sugarhi11/agent-core';
 import type { Action } from '@elizaos/core';
 import { makeAction } from '../shared';
 
@@ -32,19 +32,24 @@ export const stackingActions: Action[] = [
       'Params: { amount, cycles, poxAddress, senderKey, burnBlockHeight?, network? }.',
     similes: ['STACK_STX', 'LOCK_STX', 'START_STACKING'],
     handler: stack,
+    signed: true,
+    parseAmount: true,
   }),
   makeAction({
     name: 'stacks_delegate_stx',
     description:
       'Delegate STX to a stacking pool/operator. ' +
-      'Params: { amount, delegateTo, senderKey, untilBurnBlockHeight?, poxAddress?, network? }.',
+      'Params: { amount, delegateTo, untilBurnBlockHeight?, poxAddress?, network? }. senderKey is auto-injected.',
     similes: ['DELEGATE_STX', 'POOL_STACKING'],
     handler: delegateStx,
+    signed: true,
+    parseAmount: true,
   }),
   makeAction({
     name: 'stacks_revoke_delegate',
-    description: 'Revoke an active stacking delegation. Params: { senderKey, network? }.',
+    description: 'Revoke an active stacking delegation. senderKey is auto-injected. Params: { network? }.',
     similes: ['REVOKE_DELEGATION', 'UNDELEGATE_STX'],
     handler: revokeDelegate,
+    signed: true,
   }),
 ];
