@@ -1,0 +1,118 @@
+---
+title: Hermes
+description: Python Hermes plugin with httpx reads and a Node write bridge.
+---
+
+# Hermes plugin
+
+The Hermes plugin (`plugins/stacks/hermes`) exposes the same 19 Stacks tools to Python-based Hermes agents. **Read operations** call external APIs directly via `httpx`. **Write operations** delegate to `@stacks/agent-core` through a Node.js subprocess bridge.
+
+## Installation
+
+<Steps>
+  <Step title="Install Python dependencies">
+    ```bash
+    pip install -r plugins/stacks/hermes/requirements.txt
+    ```
+  </Step>
+  <Step title="Build agent-core">
+    ```bash
+    npm run build -w @stacks/agent-core
+    ```
+  </Step>
+  <Step title="Link the plugin">
+    ```bash
+    ln -s "$(pwd)/plugins/stacks/hermes" ~/.hermes/plugins/stacks
+    ```
+    Or copy the `hermes/` directory into your Hermes plugins folder.
+  </Step>
+  <Step title="Enable in Hermes config">
+    Add `stacks` to your enabled plugins list in your Hermes configuration file.
+  </Step>
+</Steps>
+
+## Environment variables
+
+Declared in `plugin.yaml`:
+
+```yaml
+requires_env:
+  - STACKS_NETWORK
+  - STACKS_SENDER_KEY
+```
+
+| Variable | Purpose |
+| --- | --- |
+| `STACKS_NETWORK` | `mainnet` or `testnet` |
+| `STACKS_SENDER_KEY` | Hex private key for write tools |
+
+## Architecture
+
+```
+┌─────────────────┐     httpx      ┌──────────────┐
+│  Hermes agent   │ ──────────────► │  Hiro API    │
+│  (Python)       │                 │  ALEX API    │
+│                 │                 │  Allbridge   │
+│  tools.py       │                 └──────────────┘
+│       │         │
+│       │ write   │     subprocess
+│       ▼         │ ──────────────► stacks-write.mjs
+│  bridge.py      │                      │
+└─────────────────┘                      ▼
+                                  @stacks/agent-core
+```
+
+### Read path
+
+Python handlers in `tools.py` call Hiro, ALEX, or Allbridge REST endpoints and return JSON:
+
+```json
+{ "success": true, "result": { ... } }
+```
+
+### Write path
+
+`bridge.py` spawns Node with `scripts/stacks-write.mjs`:
+
+```bash
+node stacks-write.mjs stacks_send_tokens '{"recipient":"...","amount":"1000000"}'
+```
+
+The bridge auto-injects `STACKS_SENDER_KEY` from the environment when `senderKey` is absent from params.
+
+## Write tools
+
+These tools require Node.js 22+ on `PATH`:
+
+| Tool | Description |
+| --- | --- |
+| `stacks_send_tokens` | STX transfer |
+| `stacks_stack` | Lock STX for PoX |
+| `stacks_delegate_stx` | Delegate to a pool |
+| `stacks_revoke_delegate` | Revoke delegation |
+| `stacks_transfer_name` | Transfer BNS name |
+| `stacks_contract_call` | Clarity contract call |
+| `stacks_swap_execute` | Execute ALEX swap |
+| `stacks_bridge_initiate` | Start bridge transfer |
+
+## Tool schemas
+
+JSON schemas in `schemas.py` mirror the agent-core contract so the LLM sees identical tool definitions across ElizaOS, OpenClaw, and Hermes.
+
+## Error handling
+
+All handlers return a consistent JSON envelope:
+
+```json
+{ "success": false, "error": "Failed to fetch balance: 404 Not Found" }
+```
+
+Write bridge timeouts default to **120 seconds**.
+
+<Warning>
+  The write bridge runs with `cwd` set to the repo root. Deploy Hermes with the full `stacks-plugins` repo (or a build artifact that includes `agent-core/dist` and `stacks-write.mjs`).
+</Warning>
+
+## `decode_cv` note
+
+The Hermes implementation of `stacks_decode_cv` returns the raw hex with a note to use `stacks_read_only_call` or the TypeScript `decodeCv` tool for full Clarity decoding. The TypeScript agent-core version performs full decoding via stacks.js.

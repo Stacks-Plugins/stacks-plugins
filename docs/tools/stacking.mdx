@@ -1,0 +1,186 @@
+---
+title: Stacking tools
+description: PoX stacking status, eligibility, lock, delegate, and revoke.
+---
+
+# Stacking tools
+
+Five tools for [Proof of Transfer (PoX)](https://docs.stacks.co/concepts/stacking) stacking operations — checking status, verifying eligibility, locking STX, delegating to pools, and revoking delegations.
+
+---
+
+## stacks_stacking_status
+
+Get the current stacking (PoX) lock and delegation status for an address.
+
+**Type:** Read
+
+### Parameters
+
+<ParamField body="address" type="string" required>
+  Stacks address to query.
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`.
+</ParamField>
+
+### Response
+
+Returns PoX cycle info, locked STX amount, and unlock height from the Hiro API.
+
+---
+
+## stacks_can_stack
+
+Check whether an address is eligible to stack a given amount for a number of reward cycles.
+
+**Type:** Read
+
+### Parameters
+
+<ParamField body="address" type="string" required>
+  Stacks address to check.
+</ParamField>
+
+<ParamField body="amount" type="string | number" required>
+  STX amount to lock, in microSTX.
+</ParamField>
+
+<ParamField body="cycles" type="number" required>
+  Number of reward cycles to lock for.
+</ParamField>
+
+<ParamField body="poxAddress" type="string" required>
+  Bitcoin reward address where PoX rewards are paid.
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`.
+</ParamField>
+
+### Response
+
+```json
+{
+  "address": "ST1...",
+  "network": "mainnet",
+  "eligible": true,
+  "minThresholdUstx": "20000000000",
+  "balance": "50000000000"
+}
+```
+
+---
+
+## stacks_stack
+
+Lock STX for stacking (PoX) and earn BTC rewards.
+
+**Type:** Write
+
+### Parameters
+
+<ParamField body="amount" type="string | number" required>
+  STX to lock, in microSTX.
+</ParamField>
+
+<ParamField body="cycles" type="number" required>
+  Number of reward cycles.
+</ParamField>
+
+<ParamField body="poxAddress" type="string" required>
+  BTC address for reward payouts.
+</ParamField>
+
+<ParamField body="senderKey" type="string" required>
+  Signing private key.
+</ParamField>
+
+<ParamField body="burnBlockHeight" type="number">
+  Burnchain block height to start stacking. Defaults to next cycle.
+</ParamField>
+
+<ParamField body="fee" type="string | number">
+  Transaction fee in microSTX.
+</ParamField>
+
+<ParamField body="nonce" type="string | number">
+  Account nonce.
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`.
+</ParamField>
+
+---
+
+## stacks_delegate_stx
+
+Delegate STX to a stacking pool or operator who stacks on your behalf.
+
+**Type:** Write
+
+### Parameters
+
+<ParamField body="amount" type="string | number" required>
+  Maximum STX the delegate may lock, in microSTX.
+</ParamField>
+
+<ParamField body="delegateTo" type="string" required>
+  Address of the pool/delegate operator.
+</ParamField>
+
+<ParamField body="senderKey" type="string" required>
+  Signing private key.
+</ParamField>
+
+<ParamField body="untilBurnBlockHeight" type="number">
+  Burnchain height after which delegation expires.
+</ParamField>
+
+<ParamField body="poxAddress" type="string">
+  Required BTC reward address the delegate must use.
+</ParamField>
+
+<ParamField body="fee" type="string | number">
+  Transaction fee.
+</ParamField>
+
+<ParamField body="nonce" type="string | number">
+  Account nonce.
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`.
+</ParamField>
+
+---
+
+## stacks_revoke_delegate
+
+Revoke an active stacking delegation.
+
+**Type:** Write
+
+### Parameters
+
+<ParamField body="senderKey" type="string" required>
+  Signing private key of the delegating account.
+</ParamField>
+
+<ParamField body="fee" type="string | number">
+  Transaction fee.
+</ParamField>
+
+<ParamField body="nonce" type="string | number">
+  Account nonce.
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`.
+</ParamField>
+
+<Note>
+  Stacking minimums vary by PoX cycle. Use `stacks_can_stack` before `stacks_stack` to verify eligibility.
+</Note>

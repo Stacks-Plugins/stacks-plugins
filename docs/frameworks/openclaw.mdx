@@ -1,0 +1,122 @@
+---
+title: OpenClaw
+description: Install and configure the Stacks plugin for OpenClaw agents.
+---
+
+# OpenClaw plugin
+
+`@stacks/openclaw-stacks` registers 19 Stacks blockchain tools with OpenClaw's `registerTool` API, using TypeBox schemas for parameter validation.
+
+## Installation
+
+Build dependencies first:
+
+```bash
+npm run build -w @stacks/agent-core
+npm run build -w @stacks/openclaw-stacks
+```
+
+Install into OpenClaw from the local path:
+
+```bash
+openclaw plugins install ./plugins/stacks/openclaw
+```
+
+Or install from a published package once available.
+
+## Plugin manifest
+
+OpenClaw reads `openclaw.plugin.json` for metadata, tool contracts, and configuration:
+
+```json
+{
+  "id": "stacks",
+  "name": "Stacks Plugin",
+  "contracts": {
+    "tools": [
+      "stacks_get_balance",
+      "stacks_send_tokens",
+      "..."
+    ]
+  },
+  "activation": {
+    "onStartup": true
+  }
+}
+```
+
+## Write tools are optional
+
+Tools that sign transactions are registered with `{ optional: true }`:
+
+- `stacks_send_tokens`
+- `stacks_stack`
+- `stacks_delegate_stx`
+- `stacks_revoke_delegate`
+- `stacks_transfer_name`
+- `stacks_contract_call`
+- `stacks_swap_execute`
+- `stacks_bridge_initiate`
+
+This lets agents run in **read-only mode** by default. Enable write tools only when the agent has authorization to sign.
+
+## Configuration
+
+Set the default network in plugin config:
+
+```json
+{
+  "defaultNetwork": "testnet"
+}
+```
+
+Individual tools still accept a `network` parameter to override per call.
+
+## Tool response format
+
+Each tool's `execute` handler returns OpenClaw-compatible content:
+
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{ \"address\": \"...\", \"stx\": \"1000000\" }"
+    }
+  ]
+}
+```
+
+Errors set `isError: true` with a descriptive message.
+
+## Compatibility
+
+| Field | Value |
+| --- | --- |
+| `pluginApi` | `>=2026.3.24-beta.2` |
+| `minGatewayVersion` | `2026.3.24-beta.2` |
+
+## Example tool invocation
+
+**Read — balance check:**
+
+```json
+{
+  "address": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+  "network": "mainnet"
+}
+```
+
+**Write — STX transfer:**
+
+```json
+{
+  "recipient": "ST2CY5V39NHDPWSXMW9QDT3HC3GD6QYYXXA58DKF6",
+  "amount": "1000000",
+  "senderKey": "<hex-private-key>",
+  "memo": "payment",
+  "network": "testnet"
+}
+```
+
+See [Tools](/tools/overview) for full parameter documentation.

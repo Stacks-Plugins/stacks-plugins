@@ -1,0 +1,132 @@
+---
+title: Contract tools
+description: Clarity contract calls, read-only evaluation, and value decoding.
+---
+
+# Contract tools
+
+Three tools for interacting with [Clarity](https://docs.stacks.co/clarity) smart contracts on Stacks.
+
+---
+
+## stacks_contract_call
+
+Sign and broadcast a **public** Clarity contract function call.
+
+**Type:** Write
+
+### Parameters
+
+<ParamField body="contractAddress" type="string" required>
+  Deployer address of the contract (e.g. `SP2C2YFP12AJZB4MABJBAJ55XECVS7STKV3NZCAPQ`).
+</ParamField>
+
+<ParamField body="contractName" type="string" required>
+  Contract name (e.g. `my-token`).
+</ParamField>
+
+<ParamField body="functionName" type="string" required>
+  Public function to call.
+</ParamField>
+
+<ParamField body="functionArgsHex" type="string[]">
+  Function arguments as hex-encoded serialized Clarity values.
+</ParamField>
+
+<ParamField body="senderKey" type="string" required>
+  Signing private key.
+</ParamField>
+
+<ParamField body="fee" type="string | number">
+  Transaction fee in microSTX.
+</ParamField>
+
+<ParamField body="nonce" type="string | number">
+  Account nonce.
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`.
+</ParamField>
+
+### Example
+
+```json
+{
+  "contractAddress": "SP2C2YFP12AJZB4MABJBAJ55XECVS7STKV3NZCAPQ",
+  "contractName": "my-contract",
+  "functionName": "do-something",
+  "functionArgsHex": ["0x..."],
+  "senderKey": "<hex-key>",
+  "network": "testnet"
+}
+```
+
+---
+
+## stacks_read_only_call
+
+Evaluate a **read-only** Clarity function without broadcasting a transaction.
+
+**Type:** Read
+
+### Parameters
+
+<ParamField body="contractAddress" type="string" required>
+  Contract deployer address.
+</ParamField>
+
+<ParamField body="contractName" type="string" required>
+  Contract name.
+</ParamField>
+
+<ParamField body="functionName" type="string" required>
+  Read-only function name.
+</ParamField>
+
+<ParamField body="functionArgsHex" type="string[]">
+  Arguments as hex-encoded Clarity values.
+</ParamField>
+
+<ParamField body="senderAddress" type="string">
+  Address used as `tx-sender` for evaluation. Defaults to `contractAddress`.
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`.
+</ParamField>
+
+### Response
+
+```json
+{
+  "value": { "type": "uint", "value": "1000000" },
+  "hex": "0x..."
+}
+```
+
+---
+
+## stacks_decode_cv
+
+Decode a hex-encoded serialized Clarity value into readable JSON.
+
+**Type:** Read
+
+### Parameters
+
+<ParamField body="hex" type="string" required>
+  Hex-encoded serialized Clarity value.
+</ParamField>
+
+### Response
+
+JSON representation of the Clarity value (type + value fields).
+
+<Tip>
+  Use `stacks_read_only_call` when you need to evaluate contract state. Use `stacks_decode_cv` when you already have a raw hex value from an API response or transaction.
+</Tip>
+
+<Note>
+  The Hermes Python plugin returns a simplified response for `decode_cv`. Use the TypeScript agent-core implementation for full Clarity decoding.
+</Note>

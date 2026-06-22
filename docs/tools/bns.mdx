@@ -1,0 +1,136 @@
+---
+title: BNS tools
+description: Bitcoin Naming System — resolve, lookup, price, and transfer.
+---
+
+# BNS tools
+
+Four tools for the [Bitcoin Naming System (BNS)](https://docs.stacks.co/concepts/bns) on Stacks — resolving names, looking up owners, checking registration prices, and transferring ownership.
+
+---
+
+## stacks_resolve_name
+
+Resolve a BNS name to its owner address and zonefile.
+
+**Type:** Read
+
+### Parameters
+
+<ParamField body="name" type="string" required>
+  Fully-qualified BNS name (e.g. `muneeb.id`, `myname.btc`).
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`.
+</ParamField>
+
+### Response
+
+```json
+{
+  "name": "example.id",
+  "network": "mainnet",
+  "found": true,
+  "address": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+  "zonefile": "...",
+  "expireBlock": 120000,
+  "status": "registered"
+}
+```
+
+If the name is not found, `found` is `false`.
+
+---
+
+## stacks_lookup_address
+
+List all BNS names owned by a Stacks address.
+
+**Type:** Read
+
+### Parameters
+
+<ParamField body="address" type="string" required>
+  Stacks address to look up.
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`.
+</ParamField>
+
+### Response
+
+```json
+{
+  "address": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+  "network": "mainnet",
+  "names": ["example.id", "myname.btc"]
+}
+```
+
+---
+
+## stacks_get_name_price
+
+Get the registration price for a BNS name in microSTX.
+
+**Type:** Read
+
+### Parameters
+
+<ParamField body="name" type="string" required>
+  Fully-qualified name to price (e.g. `myname.btc`).
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`.
+</ParamField>
+
+### Response
+
+```json
+{
+  "name": "myname.btc",
+  "network": "mainnet",
+  "amount": "2000000"
+}
+```
+
+---
+
+## stacks_transfer_name
+
+Transfer ownership of a BNS name to another Stacks address.
+
+**Type:** Write
+
+### Parameters
+
+<ParamField body="name" type="string" required>
+  Fully-qualified BNS name to transfer.
+</ParamField>
+
+<ParamField body="newOwnerAddress" type="string" required>
+  Recipient Stacks address.
+</ParamField>
+
+<ParamField body="senderKey" type="string" required>
+  Current owner's private key.
+</ParamField>
+
+<ParamField body="zonefile" type="string">
+  Optional updated zonefile content.
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`.
+</ParamField>
+
+### Response
+
+Standard broadcast result with `txid` and `success`.
+
+<Warning>
+  Name transfers are permanent on-chain actions. Verify the recipient address before signing.
+</Warning>

@@ -1,0 +1,100 @@
+---
+title: ElizaOS
+description: Register the Stacks plugin in an ElizaOS agent.
+---
+
+# ElizaOS plugin
+
+`plugin-eliza-stacks` adapts `@stacks/agent-core` handlers into ElizaOS **Actions** so your agent can query balances, send STX, stack, interact with BNS, call Clarity contracts, and more.
+
+## Installation
+
+Build from the monorepo (or install from your registry once published):
+
+```bash
+npm run build -w @stacks/agent-core
+npm run build -w plugin-eliza-stacks
+```
+
+Add `plugin-eliza-stacks` as a dependency in your ElizaOS project, pointing to the local path or package name.
+
+## Register the plugin
+
+```typescript
+import { stacksPlugin } from 'plugin-eliza-stacks';
+
+export const character = {
+  name: 'Stacks Agent',
+  plugins: [stacksPlugin],
+  // ...
+};
+```
+
+The plugin exports:
+
+```typescript
+export const stacksPlugin: Plugin = {
+  name: 'stacks',
+  description: 'Stacks blockchain tools: balances, STX transfers, ...',
+  actions: [/* 19 actions */],
+};
+```
+
+## Available actions
+
+All actions share the `stacks_*` naming convention from agent-core. Each action includes **similes** — alternative intent phrases the model can match:
+
+| Action | Example similes |
+| --- | --- |
+| `stacks_get_balance` | `CHECK_STACKS_BALANCE`, `GET_STX_BALANCE` |
+| `stacks_send_tokens` | `SEND_STX`, `TRANSFER_STX` |
+| `stacks_get_account_history` | `STACKS_HISTORY`, `GET_TRANSACTIONS` |
+| `stacks_stacking_status` | `STACKING_STATUS`, `POX_STATUS` |
+
+See the [tool reference](/tools/overview) for the complete list of 19 actions.
+
+## Example agent prompt
+
+```
+You have access to Stacks blockchain tools. When the user asks about STX balances,
+use stacks_get_balance with their address. Always confirm before sending tokens
+with stacks_send_tokens. Default to testnet unless the user specifies mainnet.
+```
+
+## Action parameters
+
+Actions pass parameters directly to agent-core handlers. Example for a balance check:
+
+```json
+{
+  "address": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+  "network": "testnet"
+}
+```
+
+Write actions require `senderKey` in the params object (or configure your agent to inject it securely from env).
+
+## Selective imports
+
+You can import action groups individually for custom plugin composition:
+
+```typescript
+import {
+  accountActions,
+  stackingActions,
+  bnsActions,
+  contractActions,
+  swapActions,
+} from 'plugin-eliza-stacks';
+```
+
+## Peer dependencies
+
+| Package | Version |
+| --- | --- |
+| `@elizaos/core` | `>=0.1.0` |
+| `@stacks/agent-core` | `0.1.0` (bundled dependency) |
+
+<Note>
+  ElizaOS actions return handler results as-is (JSON objects). Wrap sensitive write actions with confirmation flows in your agent logic.
+</Note>
