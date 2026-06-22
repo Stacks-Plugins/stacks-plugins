@@ -11,10 +11,11 @@ const stackingActions_1 = require("./actions/stackingActions");
 Object.defineProperty(exports, "stackingActions", { enumerable: true, get: function () { return stackingActions_1.stackingActions; } });
 const swapActions_1 = require("./actions/swapActions");
 Object.defineProperty(exports, "swapActions", { enumerable: true, get: function () { return swapActions_1.swapActions; } });
+const walletProvider_1 = require("./providers/walletProvider");
 /**
  * ElizaOS plugin exposing the full Stacks agent toolset.
  *
- * All blockchain logic lives in `@stacks/agent-core`; this package only adapts
+ * All blockchain logic lives in `@sugarhi11/agent-core`; this package only adapts
  * those handlers into ElizaOS {@link Action}s so the same implementation is
  * shared with the OpenClaw plugin.
  */
@@ -30,6 +31,6 @@ exports.stacksPlugin = {
         ...swapActions_1.swapActions,
     ],
     evaluators: [],
-    providers: [],
+    providers: [walletProvider_1.stacksWalletProvider],
 };
 exports.default = exports.stacksPlugin;

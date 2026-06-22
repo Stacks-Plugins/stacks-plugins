@@ -2,8 +2,31 @@
   "id": "stacks",
   "name": "Stacks Plugin",
   "description": "Stacks blockchain tools: balances, STX transfers, account history, stacking/PoX, BNS naming, Clarity contract calls, ALEX swaps, and bridging.",
+  "activation": {
+    "onStartup": true
+  },
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "defaultNetwork": {
+        "anyOf": [
+          {
+            "type": "string",
+            "const": "mainnet"
+          },
+          {
+            "type": "string",
+            "const": "testnet"
+          }
+        ],
+        "description": "Default Stacks network when a tool omits `network`."
+      }
+    }
+  },
+  "version": "0.1.0",
   "contracts": {
     "tools": [
+      "stacks_wallet_info",
       "stacks_get_balance",
       "stacks_send_tokens",
       "stacks_get_account_history",
@@ -26,27 +49,29 @@
     ]
   },
   "toolMetadata": {
-    "stacks_send_tokens": { "optional": true },
-    "stacks_stack": { "optional": true },
-    "stacks_delegate_stx": { "optional": true },
-    "stacks_revoke_delegate": { "optional": true },
-    "stacks_transfer_name": { "optional": true },
-    "stacks_contract_call": { "optional": true },
-    "stacks_swap_execute": { "optional": true },
-    "stacks_bridge_initiate": { "optional": true }
-  },
-  "activation": {
-    "onStartup": true
-  },
-  "configSchema": {
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-      "defaultNetwork": {
-        "type": "string",
-        "enum": ["mainnet", "testnet"],
-        "default": "mainnet"
-      }
+    "stacks_send_tokens": {
+      "optional": true
+    },
+    "stacks_stack": {
+      "optional": true
+    },
+    "stacks_delegate_stx": {
+      "optional": true
+    },
+    "stacks_revoke_delegate": {
+      "optional": true
+    },
+    "stacks_transfer_name": {
+      "optional": true
+    },
+    "stacks_contract_call": {
+      "optional": true
+    },
+    "stacks_swap_execute": {
+      "optional": true
+    },
+    "stacks_bridge_initiate": {
+      "optional": true
     }
   }
 }

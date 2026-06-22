@@ -1,7 +1,2 @@
-declare const _default: {
-    id: string;
-    name: string;
-    description: string;
-    register(api: any): void;
-};
+declare const _default: import("openclaw/plugin-sdk/tool-plugin").DefinedToolPluginEntry;
 export default _default;

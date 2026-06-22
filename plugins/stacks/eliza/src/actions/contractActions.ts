@@ -1,4 +1,4 @@
-import { contractCall, decodeCv, readOnlyCall } from '@stacks/agent-core';
+import { contractCall, decodeCv, readOnlyCall } from '@sugarhi11/agent-core';
 import type { Action } from '@elizaos/core';
 import { makeAction } from '../shared';
 
@@ -7,9 +7,10 @@ export const contractActions: Action[] = [
     name: 'stacks_contract_call',
     description:
       'Sign and broadcast a public Clarity contract function call. ' +
-      'Params: { contractAddress, contractName, functionName, functionArgsHex?, senderKey, network? }.',
+      'Params: { contractAddress, contractName, functionName, functionArgsHex?, network? }. senderKey is auto-injected.',
     similes: ['CALL_CONTRACT', 'CONTRACT_CALL', 'CLARITY_CALL'],
     handler: contractCall,
+    signed: true,
   }),
   makeAction({
     name: 'stacks_read_only_call',

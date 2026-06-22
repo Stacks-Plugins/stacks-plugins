@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stackingActions = void 0;
-const agent_core_1 = require("@stacks/agent-core");
+const agent_core_1 = require("@sugarhi11/agent-core");
 const shared_1 = require("../shared");
 exports.stackingActions = [
     (0, shared_1.makeAction)({
@@ -24,18 +24,23 @@ exports.stackingActions = [
             'Params: { amount, cycles, poxAddress, senderKey, burnBlockHeight?, network? }.',
         similes: ['STACK_STX', 'LOCK_STX', 'START_STACKING'],
         handler: agent_core_1.stack,
+        signed: true,
+        parseAmount: true,
     }),
     (0, shared_1.makeAction)({
         name: 'stacks_delegate_stx',
         description: 'Delegate STX to a stacking pool/operator. ' +
-            'Params: { amount, delegateTo, senderKey, untilBurnBlockHeight?, poxAddress?, network? }.',
+            'Params: { amount, delegateTo, untilBurnBlockHeight?, poxAddress?, network? }. senderKey is auto-injected.',
         similes: ['DELEGATE_STX', 'POOL_STACKING'],
         handler: agent_core_1.delegateStx,
+        signed: true,
+        parseAmount: true,
     }),
     (0, shared_1.makeAction)({
         name: 'stacks_revoke_delegate',
-        description: 'Revoke an active stacking delegation. Params: { senderKey, network? }.',
+        description: 'Revoke an active stacking delegation. senderKey is auto-injected. Params: { network? }.',
         similes: ['REVOKE_DELEGATION', 'UNDELEGATE_STX'],
         handler: agent_core_1.revokeDelegate,
+        signed: true,
     }),
 ];
