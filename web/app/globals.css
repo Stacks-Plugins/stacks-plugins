@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f5f5f0;
+  --foreground: #111111;
+  --stacks-orange: #ff5c00;
+  --stacks-beige: #f5f5f0;
+  --stacks-black: #111111;
+  --stacks-purple: #5546ff;
+  --stacks-purple-light: #7b6fff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-stacks-orange: var(--stacks-orange);
+  --color-stacks-beige: var(--stacks-beige);
+  --color-stacks-black: var(--stacks-black);
+  --color-stacks-purple: var(--stacks-purple);
+  --color-stacks-purple-light: var(--stacks-purple-light);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-ibm-plex-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+/* Pill button shared styles */
+.btn-pill {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2;
+}
+
+.btn-pill-orange {
+  @apply bg-stacks-orange text-white hover:bg-[#e65300] focus-visible:outline-stacks-orange;
+}
+
+.btn-pill-white {
+  @apply bg-white text-stacks-black hover:bg-white/90 focus-visible:outline-white;
+}
+
+.btn-pill-outline {
+  @apply border border-stacks-black/20 bg-transparent text-stacks-black hover:bg-stacks-black/5 focus-visible:outline-stacks-black;
+}
+
+/* Stepped transition between header and orange section */
+.stepped-top {
+  position: relative;
+}
+
+.stepped-top::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 24px;
+  background: var(--stacks-orange);
+  clip-path: polygon(0 100%, 0 0, 33% 0, 33% 50%, 66% 50%, 66% 0, 100% 0, 100% 100%);
+}
+
+@media (min-width: 768px) {
+  .stepped-top::before {
+    height: 32px;
+  }
+}
+
+/* Subtle grid background for hero graphic card */
+.hero-grid-bg {
+  background-color: #ececea;
+  background-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
