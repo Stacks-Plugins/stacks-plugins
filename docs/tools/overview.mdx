@@ -1,0 +1,95 @@
+---
+title: Tool overview
+description: All 19 Stacks agent tools — read vs write, grouped by category.
+---
+
+# Tool overview
+
+Every framework plugin exposes the same **19 tools** defined in `@stacks/agent-core`'s `STACKS_TOOLS` registry.
+
+## Tool index
+
+| Tool | Type | Category | Description |
+| --- | --- | --- | --- |
+| `stacks_get_balance` | Read | [Account](/tools/account) | STX, fungible, and NFT balances |
+| `stacks_send_tokens` | Write | [Account](/tools/account) | Sign and broadcast STX transfer |
+| `stacks_get_account_history` | Read | [Account](/tools/account) | Paginated transaction history |
+| `stacks_stacking_status` | Read | [Stacking](/tools/stacking) | PoX lock and delegation status |
+| `stacks_can_stack` | Read | [Stacking](/tools/stacking) | Stacking eligibility check |
+| `stacks_stack` | Write | [Stacking](/tools/stacking) | Lock STX for PoX rewards |
+| `stacks_delegate_stx` | Write | [Stacking](/tools/stacking) | Delegate STX to a pool |
+| `stacks_revoke_delegate` | Write | [Stacking](/tools/stacking) | Revoke active delegation |
+| `stacks_resolve_name` | Read | [BNS](/tools/bns) | Resolve BNS name to address |
+| `stacks_lookup_address` | Read | [BNS](/tools/bns) | List names owned by address |
+| `stacks_get_name_price` | Read | [BNS](/tools/bns) | BNS registration price |
+| `stacks_transfer_name` | Write | [BNS](/tools/bns) | Transfer BNS name ownership |
+| `stacks_contract_call` | Write | [Contracts](/tools/contracts) | Public Clarity function call |
+| `stacks_read_only_call` | Read | [Contracts](/tools/contracts) | Read-only Clarity evaluation |
+| `stacks_decode_cv` | Read | [Contracts](/tools/contracts) | Decode hex Clarity value |
+| `stacks_swap_quote` | Read | [Swaps & bridge](/tools/swaps-bridge) | ALEX DEX swap quote |
+| `stacks_swap_execute` | Write | [Swaps & bridge](/tools/swaps-bridge) | Execute ALEX swap |
+| `stacks_bridge_quote` | Read | [Swaps & bridge](/tools/swaps-bridge) | Allbridge cross-chain quote |
+| `stacks_bridge_initiate` | Write | [Swaps & bridge](/tools/swaps-bridge) | Initiate bridge transfer |
+
+## Read vs write
+
+<CardGroup cols={2}>
+  <Card title="Read tools (11)" icon="magnifying-glass">
+    Query chain state via Hiro API or external quote APIs. No private key required.
+  </Card>
+  <Card title="Write tools (8)" icon="pen-to-square">
+    Sign and broadcast transactions. Require `senderKey` (or `STACKS_SENDER_KEY` for Hermes).
+  </Card>
+</CardGroup>
+
+## Common parameters
+
+All tools accept:
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`. Defaults to `mainnet`.
+</ParamField>
+
+Write tools additionally accept:
+
+<ParamField body="senderKey" type="string" required>
+  Hex-encoded private key for the signing wallet.
+</ParamField>
+
+<ParamField body="fee" type="string | number">
+  Transaction fee in microSTX. Auto-estimated when omitted.
+</ParamField>
+
+<ParamField body="nonce" type="string | number">
+  Account nonce. Auto-fetched when omitted.
+</ParamField>
+
+## Response shapes
+
+**Read tools** return typed JSON objects (see category pages for fields).
+
+**Write tools** return a broadcast result:
+
+```json
+{
+  "txid": "0x...",
+  "success": true
+}
+```
+
+On failure:
+
+```json
+{
+  "txid": "",
+  "success": false,
+  "error": "Not enough funds",
+  "reason": "..."
+}
+```
+
+## Amounts
+
+Unless noted otherwise, STX amounts are in **microSTX** (1 STX = 1,000,000 microSTX).
+
+Fungible token amounts use the token's smallest unit as defined by its contract.

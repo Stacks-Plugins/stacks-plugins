@@ -1,0 +1,189 @@
+---
+title: Swaps & bridge
+description: ALEX DEX swaps and Allbridge cross-chain bridging.
+---
+
+# Swaps & bridge tools
+
+Four tools for token swaps on [ALEX](https://alexgo.io/) and cross-chain bridging via [Allbridge Core](https://allbridge.io/).
+
+<Note>
+  Swap and bridge tools target **mainnet** liquidity. Test thoroughly with small amounts before production use.
+</Note>
+
+---
+
+## stacks_swap_quote
+
+Get a token swap quote from the ALEX DEX.
+
+**Type:** Read
+
+### Parameters
+
+<ParamField body="tokenFrom" type="string" required>
+  Source token identifier (e.g. `STX` or `SP...::token-name`).
+</ParamField>
+
+<ParamField body="tokenTo" type="string" required>
+  Destination token identifier.
+</ParamField>
+
+<ParamField body="amount" type="string | number" required>
+  Input amount in the smallest unit of `tokenFrom`.
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet` (ALEX liquidity is mainnet-oriented).
+</ParamField>
+
+### Response
+
+```json
+{
+  "tokenFrom": "STX",
+  "tokenTo": "SP3...::token",
+  "amountIn": "1000000",
+  "amountOut": "950000",
+  "route": ["STX", "SP3...::token"],
+  "network": "mainnet"
+}
+```
+
+---
+
+## stacks_swap_execute
+
+Execute a token swap on the ALEX DEX.
+
+**Type:** Write
+
+### Parameters
+
+<ParamField body="tokenFrom" type="string" required>
+  Source token.
+</ParamField>
+
+<ParamField body="tokenTo" type="string" required>
+  Destination token.
+</ParamField>
+
+<ParamField body="amount" type="string | number" required>
+  Input amount.
+</ParamField>
+
+<ParamField body="minAmountOut" type="string | number" required>
+  Minimum acceptable output (slippage protection).
+</ParamField>
+
+<ParamField body="senderKey" type="string" required>
+  Signing private key.
+</ParamField>
+
+<ParamField body="functionArgsHex" type="string[]">
+  Encoded swap route arguments from the quote.
+</ParamField>
+
+<ParamField body="functionName" type="string">
+  Optional contract function name override.
+</ParamField>
+
+<ParamField body="fee" type="string | number">
+  Transaction fee.
+</ParamField>
+
+<ParamField body="nonce" type="string | number">
+  Account nonce.
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`.
+</ParamField>
+
+### Workflow
+
+1. Call `stacks_swap_quote` to get `amountOut` and `route`
+2. Set `minAmountOut` based on acceptable slippage
+3. Call `stacks_swap_execute` with quote parameters and `senderKey`
+
+---
+
+## stacks_bridge_quote
+
+Get a cross-chain bridge quote via Allbridge Core.
+
+**Type:** Read
+
+### Parameters
+
+<ParamField body="fromChain" type="string" required>
+  Source chain (e.g. `stacks`, `ethereum`, `bsc`).
+</ParamField>
+
+<ParamField body="toChain" type="string" required>
+  Destination chain.
+</ParamField>
+
+<ParamField body="token" type="string" required>
+  Token symbol (e.g. `USDC`, `aBTC`).
+</ParamField>
+
+<ParamField body="amount" type="string | number" required>
+  Amount in the token's smallest unit.
+</ParamField>
+
+### Response
+
+```json
+{
+  "fromChain": "stacks",
+  "toChain": "ethereum",
+  "token": "USDC",
+  "amountIn": "1000000",
+  "amountOut": "995000",
+  "fee": "5000",
+  "provider": "allbridge-core"
+}
+```
+
+---
+
+## stacks_bridge_initiate
+
+Initiate a cross-chain bridge transfer.
+
+**Type:** Write
+
+### Parameters
+
+<ParamField body="fromChain" type="string" required>
+  Source chain.
+</ParamField>
+
+<ParamField body="toChain" type="string" required>
+  Destination chain.
+</ParamField>
+
+<ParamField body="token" type="string" required>
+  Token to bridge.
+</ParamField>
+
+<ParamField body="amount" type="string | number" required>
+  Amount to bridge.
+</ParamField>
+
+<ParamField body="recipient" type="string" required>
+  Recipient address on the **destination** chain.
+</ParamField>
+
+<ParamField body="senderKey" type="string" required>
+  Signing private key on the source chain.
+</ParamField>
+
+<ParamField body="network" type="string">
+  Source network (`mainnet` or `testnet`).
+</ParamField>
+
+<Warning>
+  Bridge transfers involve multiple chains and may take time to finalize. Always verify chain names, token symbols, and the destination recipient address.
+</Warning>

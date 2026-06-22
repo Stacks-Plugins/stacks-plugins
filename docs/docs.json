@@ -1,0 +1,69 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Stacks Plugins",
+  "theme": "mint",
+  "description": "AI agent plugins for the Stacks blockchain — balances, transfers, stacking, BNS, Clarity contracts, swaps, and bridging.",
+  "colors": {
+    "primary": "#5546FF",
+    "light": "#7B6FFF",
+    "dark": "#3D2FE6"
+  },
+  "favicon": "/favicon.svg",
+  "navbar": {
+    "links": [
+      {
+        "label": "GitHub",
+        "href": "https://github.com/Stacks-Plugins/stacks-plugins"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get started",
+      "href": "/quickstart"
+    }
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get started",
+        "pages": [
+          "index",
+          "quickstart",
+          "architecture",
+          "configuration"
+        ]
+      },
+      {
+        "group": "Frameworks",
+        "pages": [
+          "frameworks/eliza",
+          "frameworks/openclaw",
+          "frameworks/hermes"
+        ]
+      },
+      {
+        "group": "Agent core",
+        "pages": [
+          "agent-core/overview",
+          "agent-core/extending"
+        ]
+      },
+      {
+        "group": "Tools",
+        "pages": [
+          "tools/overview",
+          "tools/account",
+          "tools/stacking",
+          "tools/bns",
+          "tools/contracts",
+          "tools/swaps-bridge"
+        ]
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/Stacks-Plugins/stacks-plugins"
+    }
+  }
+}

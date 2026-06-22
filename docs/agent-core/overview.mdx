@@ -1,0 +1,112 @@
+---
+title: Overview
+description: Use @stacks/agent-core directly in custom agent frameworks.
+---
+
+# Agent core overview
+
+`@stacks/agent-core` is the framework-agnostic foundation for all Stacks agent plugins. Import handlers directly or iterate the `STACKS_TOOLS` registry to build your own adapter.
+
+## Package info
+
+| Field | Value |
+| --- | --- |
+| Name | `@stacks/agent-core` |
+| Path | `plugins/stacks/agent-core` |
+| License | MIT |
+
+## Installation
+
+From the monorepo:
+
+```bash
+npm run build -w @stacks/agent-core
+```
+
+In another package within the workspace:
+
+```json
+{
+  "dependencies": {
+    "@stacks/agent-core": "0.1.0"
+  }
+}
+```
+
+## Quick usage
+
+```typescript
+import { getBalance, sendTokens, STACKS_TOOLS } from '@stacks/agent-core';
+
+// Call a handler directly
+const balance = await getBalance({
+  address: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+  network: 'testnet',
+});
+
+// Iterate the canonical tool registry
+for (const tool of STACKS_TOOLS) {
+  console.log(tool.name, tool.write ? '(write)' : '(read)');
+}
+```
+
+## Exports
+
+### Tool handlers
+
+| Module | Handlers |
+| --- | --- |
+| `tools/account` | `getBalance`, `sendTokens`, `getAccountHistory` |
+| `tools/stacking` | `getStackingStatus`, `canStack`, `stack`, `delegateStx`, `revokeDelegate` |
+| `tools/bns` | `resolveName`, `lookupAddress`, `getNamePrice`, `transferName` |
+| `tools/contracts` | `contractCall`, `readOnlyCall`, `decodeCv` |
+| `tools/swaps` | `swapQuote`, `swapExecute` |
+| `tools/bridge` | `bridgeQuote`, `bridgeInitiate` |
+
+### Registry
+
+```typescript
+export const STACKS_TOOLS = [
+  {
+    name: 'stacks_get_balance',
+    description: 'Get STX, fungible, and non-fungible token balances...',
+    handler: getBalance,
+    write: false,
+  },
+  // ... 18 more
+] as const;
+
+export type StacksToolName = (typeof STACKS_TOOLS)[number]['name'];
+```
+
+Use `STACKS_TOOLS` when building a new framework adapter — map each entry to your platform's tool/action format.
+
+### Client utilities
+
+```typescript
+import { apiUrl, stacksClient, resolveNetwork, fetchFn } from '@stacks/agent-core';
+
+const url = apiUrl('testnet'); // https://api.testnet.hiro.so
+const network = resolveNetwork(); // 'mainnet'
+```
+
+### Types
+
+All parameter and result interfaces live in `types.ts` — e.g. `GetBalanceParams`, `BalanceResult`, `SendTokensParams`, `BroadcastResult`.
+
+## Dependencies
+
+Built on [stacks.js](https://github.com/blockstack/stacks.js):
+
+- `@stacks/transactions` — build, sign, broadcast
+- `@stacks/network` — network configuration
+- `@stacks/stacking` — PoX operations
+- `@stacks/bns` — BNS name operations
+- `@stacks/common` — shared fetch utilities
+
+## Build
+
+```bash
+npm run build -w @stacks/agent-core   # CJS + ESM to dist/
+npm run typecheck -w @stacks/agent-core
+```

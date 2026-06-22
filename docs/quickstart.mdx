@@ -1,0 +1,117 @@
+---
+title: Quick start
+description: Clone, build, configure, and verify the Stacks agent plugins locally.
+---
+
+# Quick start
+
+Get the Stacks plugins running locally in a few minutes.
+
+## Prerequisites
+
+- Node.js 22+
+- npm (workspaces)
+- Python 3.9+ (only if using the Hermes plugin)
+
+## 1. Clone and install
+
+```bash
+git clone https://github.com/Stacks-Plugins/stacks-plugins.git
+cd stacks-plugins
+npm install
+```
+
+## 2. Build packages
+
+Build agent-core first — the framework plugins depend on it.
+
+```bash
+npm run build -w @stacks/agent-core
+npm run build -w plugin-eliza-stacks
+npm run build -w @stacks/openclaw-stacks
+```
+
+## 3. Configure environment
+
+Copy the example env file and set your network:
+
+```bash
+cp plugins/stacks/.env.example plugins/stacks/.env
+```
+
+Edit `plugins/stacks/.env`:
+
+```bash
+# Use testnet for development
+STACKS_NETWORK=testnet
+
+# Required for write-tool tests (hex-encoded private key)
+STACKS_SENDER_KEY=your_testnet_private_key_here
+```
+
+See [Configuration](/configuration) for all environment variables.
+
+## 4. Run integration tests
+
+From the repo root:
+
+```bash
+node scripts/test-agent-plugins.mjs
+```
+
+This exercises read and (optionally) write tools against the configured network.
+
+## 5. Install a framework plugin
+
+<Steps>
+  <Step title="ElizaOS">
+    Import and register the plugin in your agent:
+
+    ```typescript
+    import { stacksPlugin } from 'plugin-eliza-stacks';
+
+  const agent = {
+    plugins: [stacksPlugin],
+    // ...
+  };
+    ```
+
+    [ElizaOS guide →](/frameworks/eliza)
+  </Step>
+  <Step title="OpenClaw">
+    Install from the local path:
+
+    ```bash
+    openclaw plugins install ./plugins/stacks/openclaw
+    ```
+
+    [OpenClaw guide →](/frameworks/openclaw)
+  </Step>
+  <Step title="Hermes">
+    Symlink or copy the plugin into your Hermes plugins directory:
+
+    ```bash
+    ln -s "$(pwd)/plugins/stacks/hermes" ~/.hermes/plugins/stacks
+    ```
+
+    Enable it in your Hermes config and set `STACKS_NETWORK` / `STACKS_SENDER_KEY`.
+
+    [Hermes guide →](/frameworks/hermes)
+  </Step>
+</Steps>
+
+## Preview docs locally
+
+To preview this documentation site with Mintlify:
+
+```bash
+npm i -g mintlify
+cd docs
+mintlify dev
+```
+
+Open `http://localhost:3000` in your browser.
+
+<Warning>
+  Never commit `.env` files or private keys. Use testnet keys for local development only.
+</Warning>

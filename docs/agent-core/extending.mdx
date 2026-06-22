@@ -1,0 +1,100 @@
+---
+title: Extending agent-core
+description: Add new tools or build a custom framework adapter on top of STACKS_TOOLS.
+---
+
+# Extending agent-core
+
+This guide covers adding tools to `@stacks/agent-core` and wiring them into framework adapters.
+
+## Adding a new tool
+
+<Steps>
+  <Step title="Implement the handler">
+    Add an async function in the appropriate `src/tools/*.ts` module:
+
+    ```typescript
+    export async function myNewTool(params: MyNewToolParams): Promise<MyNewToolResult> {
+      const network = resolveNetwork(params.network);
+      // ...
+      return { /* result */ };
+    }
+    ```
+  </Step>
+  <Step title="Define types">
+    Add `MyNewToolParams` and `MyNewToolResult` to `src/types.ts`.
+  </Step>
+  <Step title="Register in STACKS_TOOLS">
+    Add an entry to the registry in `src/index.ts`:
+
+    ```typescript
+    {
+      name: 'stacks_my_new_tool',
+      description: 'Human-readable description for the LLM.',
+      handler: myNewTool,
+      write: false,
+    }
+    ```
+  </Step>
+  <Step title="Export from index">
+    Re-export the handler from `src/index.ts`.
+  </Step>
+  <Step title="Update framework adapters">
+    - **ElizaOS**: add an action in the matching `actions/*.ts` file
+    - **OpenClaw**: register with TypeBox schema in `openclaw/src/index.ts`
+    - **Hermes**: add handler in `tools.py`, schema in `schemas.py`, and update `WRITE_TOOL_NAMES` in `bridge.py` if it's a write tool
+  </Step>
+</Steps>
+
+## Tool naming convention
+
+- Prefix all tools with `stacks_`
+- Use snake_case: `stacks_get_balance`, `stacks_delegate_stx`
+- Keep names stable — agents and configs reference them by string id
+
+## Building a custom adapter
+
+Use `STACKS_TOOLS` as your source of truth:
+
+```typescript
+import { STACKS_TOOLS } from '@stacks/agent-core';
+
+function registerStacksTools(registerFn: (tool: ToolDef) => void) {
+  for (const { name, description, handler, write } of STACKS_TOOLS) {
+    registerFn({
+      name,
+      description,
+      execute: async (params) => handler(params),
+      requiresAuth: write,
+    });
+  }
+}
+```
+
+Map `write: true` tools to your framework's privileged/signed-tool path.
+
+## Write tool checklist
+
+When adding a write tool:
+
+1. Extend `SignedParams` (or a subtype) for params that need `senderKey`
+2. Use `@stacks/transactions` for signing and broadcasting
+3. Return `BroadcastResult` with `txid` and `success`
+4. Mark `write: true` in `STACKS_TOOLS`
+5. Add to Hermes `WRITE_TOOL_NAMES` and `stacks-write.mjs` dispatch
+6. Mark as `optional: true` in `openclaw.plugin.json` if applicable
+
+## Testing
+
+Run the integration test script after changes:
+
+```bash
+npm run build -w @stacks/agent-core
+node scripts/test-agent-plugins.mjs
+```
+
+Add targeted tests for new handlers in `agent-core` when the test suite grows.
+
+<Tip>
+  Prefer read-only tools where possible. Agents are safer when they query chain state without holding signing keys.
+</Tip>

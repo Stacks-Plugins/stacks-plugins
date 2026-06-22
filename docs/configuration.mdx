@@ -1,0 +1,111 @@
+---
+title: Configuration
+description: Environment variables, networks, and signing keys for Stacks agent plugins.
+---
+
+# Configuration
+
+Configure network targeting and transaction signing through environment variables and per-tool parameters.
+
+## Environment variables
+
+| Variable | Required | Default | Description |
+| --- | --- | --- | --- |
+| `STACKS_NETWORK` | Hermes: yes | `mainnet` | Target network: `mainnet` or `testnet` |
+| `STACKS_SENDER_KEY` | For write tests / Hermes writes | — | Hex-encoded private key used to sign transactions |
+
+Create your local env file from the example:
+
+```bash
+cp plugins/stacks/.env.example plugins/stacks/.env
+```
+
+Example `.env` for testnet development:
+
+```bash
+STACKS_NETWORK=testnet
+STACKS_SENDER_KEY=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b85501
+```
+
+<Warning>
+  `STACKS_SENDER_KEY` grants full control of the associated wallet. Use a dedicated testnet wallet for development. Never commit this value or pass it through untrusted agent prompts.
+</Warning>
+
+## Per-tool network override
+
+Every tool accepts an optional `network` parameter that overrides the default:
+
+```json
+{
+  "address": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+  "network": "testnet"
+}
+```
+
+| Framework | Default when omitted |
+| --- | --- |
+| `@stacks/agent-core` | `mainnet` |
+| ElizaOS | `mainnet` |
+| OpenClaw | `mainnet` (configurable via `defaultNetwork` in plugin config) |
+| Hermes | `STACKS_NETWORK` env var, then `mainnet` |
+
+## OpenClaw plugin config
+
+The OpenClaw manifest (`openclaw.plugin.json`) supports a `defaultNetwork` setting:
+
+```json
+{
+  "defaultNetwork": "testnet"
+}
+```
+
+Write tools are registered as **optional** in OpenClaw. Enable them only when your agent is authorized to sign transactions.
+
+## Hermes requirements
+
+The Hermes plugin declares required env vars in `plugin.yaml`:
+
+```yaml
+requires_env:
+  - STACKS_NETWORK
+  - STACKS_SENDER_KEY
+```
+
+For write tools, Hermes injects `STACKS_SENDER_KEY` into the payload when `senderKey` is not provided explicitly in tool params.
+
+**Additional Hermes requirements:**
+
+- Node.js 22+ on `PATH` (for the write bridge)
+- Built `@stacks/agent-core` in the repo (the bridge runs from repo root)
+
+## Hiro API endpoints
+
+| Network | Base URL |
+| --- | --- |
+| Mainnet | `https://api.hiro.so` |
+| Testnet | `https://api.testnet.hiro.so` |
+
+No API key is required for public Hiro endpoints at default rate limits. For production agents with high volume, consider a [Hiro API key](https://docs.hiro.so/stacks/api).
+
+## External APIs
+
+| Service | Used by | Endpoint |
+| --- | --- | --- |
+| ALEX DEX | `stacks_swap_quote`, `stacks_swap_execute` | `https://api.alexgo.io` |
+| Allbridge Core | `stacks_bridge_quote`, `stacks_bridge_initiate` | `https://core.api.allbridgecoreapi.net` |
+
+Swap and bridge tools are primarily oriented toward **mainnet** liquidity.
+
+## Signing parameters
+
+Write tools accept these common signing fields:
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `senderKey` | `string` | Hex-encoded private key (required for writes) |
+| `fee` | `string \| number` | Transaction fee in microSTX (auto-estimated if omitted) |
+| `nonce` | `string \| number` | Account nonce (auto-fetched if omitted) |
+
+<Tip>
+  Let the SDK estimate `fee` and `nonce` during development. Override them only when you need deterministic transaction ordering or custom fee rates.
+</Tip>

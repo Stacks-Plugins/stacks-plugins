@@ -1,0 +1,162 @@
+---
+title: Account tools
+description: Balance queries, STX transfers, and transaction history.
+---
+
+# Account tools
+
+Three tools for querying account state and sending STX.
+
+---
+
+## stacks_get_balance
+
+Get STX, fungible token, and non-fungible token balances for a Stacks address.
+
+**Type:** Read
+
+### Parameters
+
+<ParamField body="address" type="string" required>
+  Stacks address in c32 format (e.g. `ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM`).
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`. Default: `mainnet`.
+</ParamField>
+
+### Response
+
+```json
+{
+  "address": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+  "network": "mainnet",
+  "stx": "1500000000",
+  "locked": "0",
+  "totalSent": "500000000",
+  "totalReceived": "2000000000",
+  "fungibleTokens": {
+    "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE::jeff": {
+      "balance": "1000000"
+    }
+  },
+  "nonFungibleTokens": {
+    "SP...::nft": { "count": "3" }
+  }
+}
+```
+
+### Example
+
+```typescript
+import { getBalance } from '@stacks/agent-core';
+
+const result = await getBalance({
+  address: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+  network: 'testnet',
+});
+```
+
+---
+
+## stacks_send_tokens
+
+Sign and broadcast an STX transfer to another address.
+
+**Type:** Write
+
+### Parameters
+
+<ParamField body="recipient" type="string" required>
+  Destination Stacks address.
+</ParamField>
+
+<ParamField body="amount" type="string | number" required>
+  Amount in **microSTX**.
+</ParamField>
+
+<ParamField body="senderKey" type="string" required>
+  Hex-encoded private key of the sender.
+</ParamField>
+
+<ParamField body="memo" type="string">
+  Optional on-chain memo (max 34 bytes).
+</ParamField>
+
+<ParamField body="fee" type="string | number">
+  Transaction fee in microSTX.
+</ParamField>
+
+<ParamField body="nonce" type="string | number">
+  Explicit account nonce.
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`.
+</ParamField>
+
+### Response
+
+```json
+{
+  "txid": "0x1234...",
+  "success": true
+}
+```
+
+### Example
+
+Send 1 STX on testnet:
+
+```json
+{
+  "recipient": "ST2CY5V39NHDPWSXMW9QDT3HC3GD6QYYXXA58DKF6",
+  "amount": "1000000",
+  "senderKey": "<hex-key>",
+  "memo": "thanks",
+  "network": "testnet"
+}
+```
+
+<Warning>
+  Double-check recipient address and amount before broadcasting. Transactions are irreversible.
+</Warning>
+
+---
+
+## stacks_get_account_history
+
+Get paginated transaction history for a Stacks address.
+
+**Type:** Read
+
+### Parameters
+
+<ParamField body="address" type="string" required>
+  Stacks address to query.
+</ParamField>
+
+<ParamField body="limit" type="number">
+  Page size. Default `20`, max `50`.
+</ParamField>
+
+<ParamField body="offset" type="number">
+  Pagination offset. Default `0`.
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`.
+</ParamField>
+
+### Response
+
+```json
+{
+  "address": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+  "network": "mainnet",
+  "total": 142,
+  "limit": 20,
+  "offset": 0,
+  "transactions": [ /* Hiro tx objects */ ]
+}
+```
