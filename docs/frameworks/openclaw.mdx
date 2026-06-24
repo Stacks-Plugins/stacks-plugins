@@ -5,15 +5,14 @@ description: Install and configure the Stacks plugin for OpenClaw agents.
 
 # OpenClaw plugin
 
-`@stacks/openclaw-stacks` registers 19 Stacks blockchain tools with OpenClaw's `registerTool` API, using TypeBox schemas for parameter validation.
+`@stacks/openclaw-stacks` registers Stacks blockchain tools with OpenClaw's tool plugin API, using TypeBox schemas for parameter validation.
 
 ## Installation
 
-Build dependencies first:
-
 ```bash
-npm run build -w @stacks/agent-core
-npm run build -w @stacks/openclaw-stacks
+cd plugins/stacks/openclaw
+npm install
+npm run build
 ```
 
 Install into OpenClaw from the local path:
@@ -24,6 +23,19 @@ openclaw plugins install ./plugins/stacks/openclaw
 
 Or install from a published package once available.
 
+Validate the plugin bundle:
+
+```bash
+npm run plugin:validate
+```
+
+## Tools
+
+OpenClaw exposes **20 tools**:
+
+- **19 core tools** from `@sugarhi11/agent-core` (`STACKS_TOOLS`)
+- **`stacks_wallet_info`** — shows configured wallet address, network, and signing status (OpenClaw-specific)
+
 ## Plugin manifest
 
 OpenClaw reads `openclaw.plugin.json` for metadata, tool contracts, and configuration:
@@ -32,22 +44,24 @@ OpenClaw reads `openclaw.plugin.json` for metadata, tool contracts, and configur
 {
   "id": "stacks",
   "name": "Stacks Plugin",
+  "configSchema": {
+    "properties": {
+      "defaultNetwork": { "enum": ["mainnet", "testnet"] }
+    }
+  },
   "contracts": {
     "tools": [
+      "stacks_wallet_info",
       "stacks_get_balance",
-      "stacks_send_tokens",
-      "..."
+      "stacks_send_tokens"
     ]
-  },
-  "activation": {
-    "onStartup": true
   }
 }
 ```
 
 ## Write tools are optional
 
-Tools that sign transactions are registered with `{ optional: true }`:
+Tools that sign transactions are registered with `{ optional: true }` in `toolMetadata`:
 
 - `stacks_send_tokens`
 - `stacks_stack`
@@ -74,27 +88,16 @@ Individual tools still accept a `network` parameter to override per call.
 
 ## Tool response format
 
-Each tool's `execute` handler returns OpenClaw-compatible content:
+Each tool's `execute` handler returns formatted text from agent-core handlers. Errors throw with a descriptive message.
 
-```json
-{
-  "content": [
-    {
-      "type": "text",
-      "text": "{ \"address\": \"...\", \"stx\": \"1000000\" }"
-    }
-  ]
-}
+## Tests
+
+```bash
+cd plugins/stacks/openclaw
+npm test
 ```
 
-Errors set `isError: true` with a descriptive message.
-
-## Compatibility
-
-| Field | Value |
-| --- | --- |
-| `pluginApi` | `>=2026.3.24-beta.2` |
-| `minGatewayVersion` | `2026.3.24-beta.2` |
+Vitest verifies all 20 registered tool names including `stacks_wallet_info`.
 
 ## Example tool invocation
 

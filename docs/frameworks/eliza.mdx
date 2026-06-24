@@ -5,15 +5,16 @@ description: Register the Stacks plugin in an ElizaOS agent.
 
 # ElizaOS plugin
 
-`plugin-eliza-stacks` adapts `@stacks/agent-core` handlers into ElizaOS **Actions** so your agent can query balances, send STX, stack, interact with BNS, call Clarity contracts, and more.
+`plugin-eliza-stacks` adapts `@sugarhi11/agent-core` handlers into ElizaOS **Actions** so your agent can query balances, send STX, stack, interact with BNS, call Clarity contracts, and more.
 
 ## Installation
 
-Build from the monorepo (or install from your registry once published):
+Build from this repository (or install from your registry once published):
 
 ```bash
-npm run build -w @stacks/agent-core
-npm run build -w plugin-eliza-stacks
+cd plugins/stacks/eliza
+npm install
+npm run build
 ```
 
 Add `plugin-eliza-stacks` as a dependency in your ElizaOS project, pointing to the local path or package name.
@@ -37,12 +38,25 @@ export const stacksPlugin: Plugin = {
   name: 'stacks',
   description: 'Stacks blockchain tools: balances, STX transfers, ...',
   actions: [/* 19 actions */],
+  providers: [stacksWalletProvider],
 };
+```
+
+## Wallet provider
+
+The **`STACKS_WALLET`** provider injects network, wallet address, and signing readiness into agent context. It lets the model resolve "my balance" or "send from my wallet" without asking the user for an address or private key.
+
+Configure via environment variables:
+
+```bash
+STACKS_NETWORK=testnet
+STACKS_SENDER_KEY=...          # optional for read-only agents
+STACKS_WALLET_ADDRESS=ST...    # optional; derived from sender key
 ```
 
 ## Available actions
 
-All actions share the `stacks_*` naming convention from agent-core. Each action includes **similes** — alternative intent phrases the model can match:
+All 19 actions share the `stacks_*` naming convention from agent-core. Each action includes **similes** — alternative intent phrases the model can match:
 
 | Action | Example similes |
 | --- | --- |
@@ -51,14 +65,15 @@ All actions share the `stacks_*` naming convention from agent-core. Each action 
 | `stacks_get_account_history` | `STACKS_HISTORY`, `GET_TRANSACTIONS` |
 | `stacks_stacking_status` | `STACKING_STATUS`, `POX_STATUS` |
 
-See the [tool reference](/tools/overview) for the complete list of 19 actions.
+See the [tool reference](/tools/overview) for the complete list.
 
 ## Example agent prompt
 
 ```
 You have access to Stacks blockchain tools. When the user asks about STX balances,
-use stacks_get_balance with their address. Always confirm before sending tokens
-with stacks_send_tokens. Default to testnet unless the user specifies mainnet.
+use stacks_get_balance with their address (or omit address for the agent wallet).
+Always confirm before sending tokens with stacks_send_tokens. Default to testnet
+unless the user specifies mainnet.
 ```
 
 ## Action parameters
@@ -72,11 +87,11 @@ Actions pass parameters directly to agent-core handlers. Example for a balance c
 }
 ```
 
-Write actions require `senderKey` in the params object (or configure your agent to inject it securely from env).
+Write actions require `senderKey` in params or `STACKS_SENDER_KEY` in the environment. Human-readable STX amounts (e.g. `"1 STX"`) are converted to microSTX automatically.
 
 ## Selective imports
 
-You can import action groups individually for custom plugin composition:
+Import action groups individually for custom plugin composition:
 
 ```typescript
 import {
@@ -92,8 +107,8 @@ import {
 
 | Package | Version |
 | --- | --- |
-| `@elizaos/core` | `>=0.1.0` |
-| `@stacks/agent-core` | `0.1.0` (bundled dependency) |
+| `@elizaos/core` | `>=1.7.0` |
+| `@sugarhi11/agent-core` | `^0.1.0` (bundled dependency) |
 
 <Note>
   ElizaOS actions return handler results as-is (JSON objects). Wrap sensitive write actions with confirmation flows in your agent logic.

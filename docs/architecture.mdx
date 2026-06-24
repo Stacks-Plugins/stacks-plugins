@@ -1,6 +1,6 @@
 ---
 title: Architecture
-description: How agent-core, framework adapters, and the Hermes write bridge fit together.
+description: How agent-core, framework adapters, and the Hermes Node bridge fit together.
 ---
 
 # Architecture
@@ -15,10 +15,14 @@ flowchart TB
     Hermes[hermes Python plugin]
   end
 
-  subgraph core ["@stacks/agent-core"]
+  subgraph npm ["@sugarhi11/agent-core (npm)"]
     Registry[STACKS_TOOLS registry]
     Tools[Tool handlers]
     Client[Hiro API client]
+  end
+
+  subgraph source ["plugins/stacks/agent-core (source)"]
+    SourceCore["@stacks/agent-core"]
   end
 
   subgraph external [External services]
@@ -28,10 +32,10 @@ flowchart TB
     Chain[Stacks blockchain]
   end
 
-  Eliza --> Registry
-  OpenClaw --> Registry
-  Hermes -->|read via httpx| Hiro
-  Hermes -->|write via Node bridge| Tools
+  SourceCore -.->|publish| npm
+  Eliza --> npm
+  OpenClaw --> npm
+  Hermes -->|stacks-bridge.mjs| npm
   Tools --> Client
   Tools --> Chain
   Client --> Hiro
@@ -42,18 +46,26 @@ flowchart TB
 ## Repository layout
 
 ```
-plugins/stacks/
-├── agent-core/     @stacks/agent-core — shared TypeScript implementations
-├── eliza/          ElizaOS plugin (actions)
-├── openclaw/       OpenClaw plugin (registerTool + manifest)
-├── hermes/         Hermes plugin (Python + Node write bridge)
-├── .env.example    Environment variables for local dev
+stacks-plugins/
+├── docs/                       Mintlify documentation (this site)
+├── plugins/stacks/
+│   ├── agent-core/             @stacks/agent-core — shared TypeScript implementations
+│   ├── eliza/                  ElizaOS plugin (actions + wallet provider)
+│   ├── openclaw/               OpenClaw plugin (registerTool + manifest)
+│   ├── hermes/                 Hermes plugin (Python + Node bridge)
+│   │   ├── scripts/
+│   │   │   ├── stacks-bridge.mjs   All-tool dispatcher
+│   │   │   └── stacks-write.mjs    Legacy write-only bridge
+│   │   └── skills/
+│   │       └── stacks-onchain/     Bundled agent skill
+│   ├── .env.example
+│   └── README.md
 └── README.md
 ```
 
-## `@stacks/agent-core`
+## Agent core
 
-The core package exports:
+The core package (`plugins/stacks/agent-core`, npm name `@stacks/agent-core`, published as **`@sugarhi11/agent-core`**) exports:
 
 - **Tool handlers** — async functions such as `getBalance`, `sendTokens`, `stack`
 - **`STACKS_TOOLS`** — canonical registry with `name`, `description`, `handler`, and `write` flag
@@ -64,33 +76,38 @@ All blockchain I/O goes through [stacks.js](https://github.com/blockstack/stacks
 
 ## Framework adapters
 
-| Framework | Adapter pattern | Write tools |
-| --- | --- | --- |
-| **ElizaOS** | Wraps handlers in `Action` objects via `makeAction()` | `senderKey` in action params |
-| **OpenClaw** | Registers tools with TypeBox schemas via `api.registerTool()` | Marked `optional: true` in manifest |
-| **Hermes** | Python handlers + JSON schemas | Delegates to `stacks-write.mjs` subprocess |
+| Framework | Adapter pattern | Tool count | Write tools |
+| --- | --- | --- | --- |
+| **ElizaOS** | Wraps handlers in `Action` objects via `makeAction()`; `STACKS_WALLET` provider | 19 | `senderKey` or `STACKS_SENDER_KEY` |
+| **OpenClaw** | Registers tools with TypeBox schemas via `defineToolPlugin()` | 20 (+ `stacks_wallet_info`) | Marked `optional: true` in manifest |
+| **Hermes** | Python handlers + Node subprocess bridge | 19 | `STACKS_SENDER_KEY` injected by bridge |
 
 ### ElizaOS
 
-`plugin-eliza-stacks` imports handlers directly from `@stacks/agent-core` and maps them to ElizaOS `Action`s with similes for intent matching. No duplicate business logic.
+`plugin-eliza-stacks` imports handlers from `@sugarhi11/agent-core` and maps them to ElizaOS `Action`s with similes for intent matching. The **`STACKS_WALLET`** provider injects network, wallet address, and signing status into agent context.
 
 ### OpenClaw
 
-`@stacks/openclaw-stacks` uses `definePluginEntry` and registers each tool with a TypeBox parameter schema. Write tools are registered as **optional** so agents can run in read-only mode.
+`@stacks/openclaw-stacks` uses `defineToolPlugin` and registers each core tool with a TypeBox parameter schema. It also exposes **`stacks_wallet_info`** for wallet/network status. Write tools are registered as **optional** so agents can run in read-only mode.
 
 ### Hermes
 
-The Hermes plugin is Python-first for reads (direct `httpx` calls to Hiro, ALEX, and Allbridge). Write operations spawn a Node subprocess running `hermes/scripts/stacks-write.mjs`, which imports the same handlers from `@stacks/agent-core`.
+All Hermes tool handlers are thin Python wrappers that delegate to **`scripts/stacks-bridge.mjs`**, which loads `@sugarhi11/agent-core` and dispatches to the matching handler in `STACKS_TOOLS`.
 
 ```
-Hermes (Python)  →  bridge.py  →  stacks-write.mjs  →  @stacks/agent-core
+Hermes (Python)  →  bridge.py  →  stacks-bridge.mjs  →  @sugarhi11/agent-core
 ```
 
-This keeps signing logic in one place while letting Hermes agents stay in Python for orchestration.
+The plugin also registers:
+
+- **`/stacks`** slash command — wallet and signing status
+- **`pre_llm_call`** hook — injects wallet context on the first turn
+- **`post_tool_call`** hook — logs Stacks tool usage
+- **Bundled skill** — `skills/stacks-onchain/SKILL.md`
 
 ## Tool contract
 
-Every framework exposes the **same 19 tool names** (e.g. `stacks_get_balance`, `stacks_send_tokens`). Parameters and return shapes match `@stacks/agent-core` types so agents can be ported between frameworks without retraining on different schemas.
+Every framework exposes the **same 19 core tool names** (e.g. `stacks_get_balance`, `stacks_send_tokens`). OpenClaw adds `stacks_wallet_info`. Parameters and return shapes match agent-core types so agents can be ported between frameworks without retraining on different schemas.
 
 See the [tool overview](/tools/overview) for the full list.
 
@@ -110,5 +127,5 @@ See the [tool overview](/tools/overview) for the full list.
 4. `{ txid, success }` returned to the agent
 
 <Note>
-  Amounts are always in **microSTX** (1 STX = 1,000,000 microSTX) unless noted otherwise for fungible tokens.
+  Amounts are always in **microSTX** (1 STX = 1,000,000 microSTX) unless noted otherwise for fungible tokens. Eliza and Hermes adapters can parse human-readable STX amounts (e.g. `"1 STX"`) into microSTX.
 </Note>

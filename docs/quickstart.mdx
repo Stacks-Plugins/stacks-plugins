@@ -10,56 +10,74 @@ Get the Stacks plugins running locally in a few minutes.
 ## Prerequisites
 
 - Node.js 22+
-- npm (workspaces)
+- npm
 - Python 3.9+ (only if using the Hermes plugin)
 
-## 1. Clone and install
+## 1. Clone the repository
 
 ```bash
 git clone https://github.com/Stacks-Plugins/stacks-plugins.git
 cd stacks-plugins
-npm install
 ```
+
+Each package under `plugins/stacks/` is standalone — there is no root `package.json` or npm workspace.
 
 ## 2. Build packages
 
-Build agent-core first — the framework plugins depend on it.
+Framework adapters depend on **`@sugarhi11/agent-core`** from npm (installed via each package's `npm install`). To develop agent-core locally, build it first:
 
 ```bash
-npm run build -w @stacks/agent-core
-npm run build -w plugin-eliza-stacks
-npm run build -w @stacks/openclaw-stacks
+cd plugins/stacks/agent-core
+npm install
+npm run build
+```
+
+Then build the framework plugin you need:
+
+```bash
+# ElizaOS
+cd ../eliza
+npm install
+npm run build
+
+# OpenClaw
+cd ../openclaw
+npm install
+npm run build
+
+# Hermes (Node bridge only — no TypeScript build)
+cd ../hermes
+npm install
 ```
 
 ## 3. Configure environment
 
-Copy the example env file and set your network:
+Copy the example env file or export variables in your shell:
 
 ```bash
 cp plugins/stacks/.env.example plugins/stacks/.env
 ```
 
-Edit `plugins/stacks/.env`:
+Edit `plugins/stacks/.env` (or set in `~/.hermes/.env` for Hermes):
 
 ```bash
-# Use testnet for development
 STACKS_NETWORK=testnet
-
-# Required for write-tool tests (hex-encoded private key)
 STACKS_SENDER_KEY=your_testnet_private_key_here
+# STACKS_WALLET_ADDRESS=ST...   # optional; derived from sender key if omitted
 ```
 
 See [Configuration](/configuration) for all environment variables.
 
-## 4. Run integration tests
+## 4. Run tests
 
-From the repo root:
+OpenClaw includes Vitest unit tests:
 
 ```bash
-node scripts/test-agent-plugins.mjs
+cd plugins/stacks/openclaw
+npm test
 ```
 
-This exercises read and (optionally) write tools against the configured network.
+Agent-core ships with a Jest placeholder (`npm test` in `plugins/stacks/agent-core`).
 
 ## 5. Install a framework plugin
 
@@ -70,10 +88,10 @@ This exercises read and (optionally) write tools against the configured network.
     ```typescript
     import { stacksPlugin } from 'plugin-eliza-stacks';
 
-  const agent = {
-    plugins: [stacksPlugin],
-    // ...
-  };
+    const agent = {
+      plugins: [stacksPlugin],
+      // ...
+    };
     ```
 
     [ElizaOS guide →](/frameworks/eliza)
@@ -94,7 +112,7 @@ This exercises read and (optionally) write tools against the configured network.
     ln -s "$(pwd)/plugins/stacks/hermes" ~/.hermes/plugins/stacks
     ```
 
-    Enable it in your Hermes config and set `STACKS_NETWORK` / `STACKS_SENDER_KEY`.
+    Enable it in your Hermes config and set `STACKS_NETWORK` / `STACKS_SENDER_KEY` in `~/.hermes/.env`.
 
     [Hermes guide →](/frameworks/hermes)
   </Step>

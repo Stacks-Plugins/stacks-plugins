@@ -1,24 +1,21 @@
 ---
 title: Hermes
-description: Python Hermes plugin with httpx reads and a Node write bridge.
+description: Python Hermes plugin with a Node bridge to @sugarhi11/agent-core.
 ---
 
 # Hermes plugin
 
-The Hermes plugin (`plugins/stacks/hermes`) exposes the same 19 Stacks tools to Python-based Hermes agents. **Read operations** call external APIs directly via `httpx`. **Write operations** delegate to `@stacks/agent-core` through a Node.js subprocess bridge.
+The Hermes plugin (`plugins/stacks/hermes`) exposes the same **19 core Stacks tools** to Python-based Hermes agents. Every tool call — read and write — delegates to `@sugarhi11/agent-core` through a Node.js subprocess bridge.
 
 ## Installation
 
 <Steps>
-  <Step title="Install Python dependencies">
+  <Step title="Install Node bridge dependencies">
     ```bash
-    pip install -r plugins/stacks/hermes/requirements.txt
+    cd plugins/stacks/hermes
+    npm install
     ```
-  </Step>
-  <Step title="Build agent-core">
-    ```bash
-    npm run build -w @stacks/agent-core
-    ```
+    This installs `@sugarhi11/agent-core` used by `scripts/stacks-bridge.mjs`.
   </Step>
   <Step title="Link the plugin">
     ```bash
@@ -26,63 +23,78 @@ The Hermes plugin (`plugins/stacks/hermes`) exposes the same 19 Stacks tools to 
     ```
     Or copy the `hermes/` directory into your Hermes plugins folder.
   </Step>
+  <Step title="Configure environment">
+    Set variables in `~/.hermes/.env`:
+
+    ```bash
+    STACKS_NETWORK=testnet
+    STACKS_SENDER_KEY=your_testnet_private_key_hex
+    ```
+  </Step>
   <Step title="Enable in Hermes config">
     Add `stacks` to your enabled plugins list in your Hermes configuration file.
   </Step>
 </Steps>
 
+No pip packages are required — see `requirements.txt`.
+
 ## Environment variables
-
-Declared in `plugin.yaml`:
-
-```yaml
-requires_env:
-  - STACKS_NETWORK
-  - STACKS_SENDER_KEY
-```
 
 | Variable | Purpose |
 | --- | --- |
-| `STACKS_NETWORK` | `mainnet` or `testnet` |
-| `STACKS_SENDER_KEY` | Hex private key for write tools |
+| `STACKS_NETWORK` | `mainnet` or `testnet` — injected into tool params when omitted |
+| `STACKS_SENDER_KEY` | Hex private key for write tools — injected when `senderKey` is absent |
+| `STACKS_WALLET_ADDRESS` | Optional explicit wallet address |
+
+Read-only tools work without `STACKS_SENDER_KEY`. Write tools register a `check_fn` that verifies signing is configured before the handler runs.
 
 ## Architecture
 
 ```
-┌─────────────────┐     httpx      ┌──────────────┐
-│  Hermes agent   │ ──────────────► │  Hiro API    │
-│  (Python)       │                 │  ALEX API    │
-│                 │                 │  Allbridge   │
-│  tools.py       │                 └──────────────┘
-│       │         │
-│       │ write   │     subprocess
-│       ▼         │ ──────────────► stacks-write.mjs
+┌─────────────────┐
+│  Hermes agent   │
+│  (Python)       │
+│                 │
+│  tools.py       │     subprocess
+│       │         │ ──────────────► stacks-bridge.mjs
 │  bridge.py      │                      │
 └─────────────────┘                      ▼
-                                  @stacks/agent-core
+                                  @sugarhi11/agent-core
+                                        │
+                                        ▼
+                                   Hiro / ALEX / Allbridge / chain
 ```
 
-### Read path
+### Bridge dispatch
 
-Python handlers in `tools.py` call Hiro, ALEX, or Allbridge REST endpoints and return JSON:
-
-```json
-{ "success": true, "result": { ... } }
-```
-
-### Write path
-
-`bridge.py` spawns Node with `scripts/stacks-write.mjs`:
+`bridge.py` spawns Node with `scripts/stacks-bridge.mjs`:
 
 ```bash
-node stacks-write.mjs stacks_send_tokens '{"recipient":"...","amount":"1000000"}'
+node stacks-bridge.mjs stacks_get_balance '{"address":"ST1..."}'
 ```
 
-The bridge auto-injects `STACKS_SENDER_KEY` from the environment when `senderKey` is absent from params.
+The bridge:
+
+1. Loads `@sugarhi11/agent-core` and looks up the handler in `STACKS_TOOLS`
+2. Injects `STACKS_NETWORK` and `STACKS_SENDER_KEY` from the environment when missing from params
+3. Returns `{ success: true, result: ... }` or `{ success: false, error: "..." }`
+
+A legacy write-only script (`stacks-write.mjs`) remains for backward compatibility; new integrations should use `stacks-bridge.mjs`.
+
+## Plugin features
+
+Beyond the 19 tools, the Hermes plugin registers:
+
+| Feature | Description |
+| --- | --- |
+| **`/stacks`** | Slash command showing wallet/network status and signing readiness |
+| **`pre_llm_call` hook** | Injects wallet context on the first turn of each session |
+| **`post_tool_call` hook** | Logs Stacks tool usage |
+| **Bundled skill** | `skills/stacks-onchain/SKILL.md` — load via `skill_view("stacks:stacks-onchain")` |
 
 ## Write tools
 
-These tools require Node.js 22+ on `PATH`:
+These tools require Node.js 22+ on `PATH` and `STACKS_SENDER_KEY`:
 
 | Tool | Description |
 | --- | --- |
@@ -107,12 +119,12 @@ All handlers return a consistent JSON envelope:
 { "success": false, "error": "Failed to fetch balance: 404 Not Found" }
 ```
 
-Write bridge timeouts default to **120 seconds**.
+Bridge timeouts default to **120 seconds**.
 
 <Warning>
-  The write bridge runs with `cwd` set to the repo root. Deploy Hermes with the full `stacks-plugins` repo (or a build artifact that includes `agent-core/dist` and `stacks-write.mjs`).
+  The bridge runs with `cwd` set to `plugins/stacks/hermes/`. Deploy Hermes with the plugin directory intact (including `node_modules/@sugarhi11/agent-core` and `scripts/stacks-bridge.mjs`).
 </Warning>
 
-## `decode_cv` note
+## Amount parsing
 
-The Hermes implementation of `stacks_decode_cv` returns the raw hex with a note to use `stacks_read_only_call` or the TypeScript `decodeCv` tool for full Clarity decoding. The TypeScript agent-core version performs full decoding via stacks.js.
+Hermes adapters accept human-readable STX amounts (e.g. `"1 STX"`, `"0.5"`) and convert them to microSTX before calling agent-core handlers.

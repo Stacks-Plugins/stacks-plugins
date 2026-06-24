@@ -5,13 +5,13 @@ description: AI agent plugins that give LLMs safe, structured access to the Stac
 
 # Stacks Plugins
 
-Stacks Plugins is a monorepo of **AI agent integrations** for the [Stacks](https://www.stacks.co/) blockchain. Each plugin exposes the same **19 tools** — balances, STX transfers, account history, PoX stacking, BNS naming, Clarity contract calls, ALEX swaps, and Allbridge bridging — across three agent frameworks.
+Stacks Plugins is a collection of **AI agent integrations** for the [Stacks](https://www.stacks.co/) blockchain. Each plugin exposes the same **19 core tools** — balances, STX transfers, account history, PoX stacking, BNS naming, Clarity contract calls, ALEX swaps, and Allbridge bridging — across three agent frameworks.
 
-Logic lives once in **`@stacks/agent-core`**. Framework adapters (ElizaOS, OpenClaw, Hermes) translate that shared registry into each ecosystem's plugin format.
+Tool logic lives in **`@stacks/agent-core`** (`plugins/stacks/agent-core`). Framework adapters import the published npm package **`@sugarhi11/agent-core`**, which is built from that source.
 
 <CardGroup cols={2}>
   <Card title="Quick start" icon="rocket" href="/quickstart">
-    Build the packages, configure your network, and run the integration test script.
+    Build the packages, configure your network, and wire up a framework plugin.
   </Card>
   <Card title="Tool reference" icon="wrench" href="/tools/overview">
     Browse all 19 agent tools with parameters and examples.
@@ -22,35 +22,54 @@ Logic lives once in **`@stacks/agent-core`**. Framework adapters (ElizaOS, OpenC
   <Card title="OpenClaw" icon="plug" href="/frameworks/openclaw">
     Install the OpenClaw plugin with `openclaw plugins install`.
   </Card>
+  <Card title="Hermes" icon="python" href="/frameworks/hermes">
+    Symlink the Python plugin and enable the Node bridge.
+  </Card>
 </CardGroup>
+
+## Repository layout
+
+```
+stacks-plugins/
+├── docs/                       This documentation site (Mintlify)
+├── plugins/stacks/
+│   ├── agent-core/             @stacks/agent-core — shared tool implementations
+│   ├── eliza/                  plugin-eliza-stacks
+│   ├── openclaw/               @stacks/openclaw-stacks
+│   └── hermes/                 Hermes Python plugin + Node bridge
+└── README.md
+```
+
+There is no root npm workspace. Each package under `plugins/stacks/` has its own `package.json` and is built independently.
 
 ## What's included
 
 | Package | Path | Role |
 | --- | --- | --- |
-| `@stacks/agent-core` | `plugins/stacks/agent-core` | Framework-agnostic tool implementations |
-| `plugin-eliza-stacks` | `plugins/stacks/eliza` | ElizaOS actions adapter |
-| `@stacks/openclaw-stacks` | `plugins/stacks/openclaw` | OpenClaw `registerTool` adapter |
-| Hermes plugin | `plugins/stacks/hermes` | Python read tools + Node write bridge |
+| `@stacks/agent-core` | `plugins/stacks/agent-core` | Framework-agnostic tool implementations (local source) |
+| `@sugarhi11/agent-core` | npm | Published package consumed by framework adapters |
+| `plugin-eliza-stacks` | `plugins/stacks/eliza` | ElizaOS actions + `STACKS_WALLET` provider |
+| `@stacks/openclaw-stacks` | `plugins/stacks/openclaw` | OpenClaw tool plugin (19 core tools + `stacks_wallet_info`) |
+| Hermes plugin | `plugins/stacks/hermes` | Python registration, hooks, `/stacks` command, bundled skills |
 
 ## Design principles
 
 <AccordionGroup>
   <Accordion title="Single source of truth">
-    The `STACKS_TOOLS` registry in `@stacks/agent-core` defines stable tool names, descriptions, and handlers. All three frameworks stay in sync from one implementation.
+    The `STACKS_TOOLS` registry in agent-core defines stable tool names, descriptions, and handlers. ElizaOS and OpenClaw import handlers from `@sugarhi11/agent-core`; Hermes routes all calls through `stacks-bridge.mjs` to the same handlers.
   </Accordion>
   <Accordion title="Read vs write separation">
-    Read tools query the [Hiro API](https://docs.hiro.so/stacks/api). Write tools sign and broadcast transactions via `@stacks/transactions` and require an explicit `senderKey` (or `STACKS_SENDER_KEY` for Hermes).
+    Read tools query the [Hiro API](https://docs.hiro.so/stacks/api). Write tools sign and broadcast transactions via `@stacks/transactions` and require an explicit `senderKey` (or `STACKS_SENDER_KEY` from the environment).
   </Accordion>
   <Accordion title="Network-aware">
-    Every tool accepts an optional `network` parameter (`mainnet` or `testnet`). Defaults to `mainnet`.
+    Every tool accepts an optional `network` parameter (`mainnet` or `testnet`). Defaults vary by framework — see [Configuration](/configuration).
   </Accordion>
 </AccordionGroup>
 
 ## Requirements
 
-- **Node.js** 22+ (TypeScript plugins and Hermes write bridge)
-- **Python** 3.9+ (Hermes plugin)
+- **Node.js** 22+ (TypeScript plugins and Hermes Node bridge)
+- **Python** 3.9+ (Hermes plugin — no required pip packages)
 - A Hiro API endpoint (public mainnet/testnet URLs are used by default)
 
 <Note>

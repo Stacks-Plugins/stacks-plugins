@@ -1,42 +1,45 @@
 ---
 title: Overview
-description: Use @stacks/agent-core directly in custom agent frameworks.
+description: Use agent-core directly in custom agent frameworks.
 ---
 
 # Agent core overview
 
-`@stacks/agent-core` is the framework-agnostic foundation for all Stacks agent plugins. Import handlers directly or iterate the `STACKS_TOOLS` registry to build your own adapter.
+`@stacks/agent-core` is the framework-agnostic foundation for all Stacks agent plugins. The source lives at `plugins/stacks/agent-core` and is published to npm as **`@sugarhi11/agent-core`**, which ElizaOS, OpenClaw, and Hermes adapters depend on.
+
+Import handlers directly or iterate the `STACKS_TOOLS` registry to build your own adapter.
 
 ## Package info
 
 | Field | Value |
 | --- | --- |
-| Name | `@stacks/agent-core` |
+| Local name | `@stacks/agent-core` |
+| Published name | `@sugarhi11/agent-core` |
 | Path | `plugins/stacks/agent-core` |
 | License | MIT |
 
 ## Installation
 
-From the monorepo:
+**From npm** (used by framework adapters):
 
 ```bash
-npm run build -w @stacks/agent-core
+npm install @sugarhi11/agent-core
 ```
 
-In another package within the workspace:
+**From source** (local development):
 
-```json
-{
-  "dependencies": {
-    "@stacks/agent-core": "0.1.0"
-  }
-}
+```bash
+cd plugins/stacks/agent-core
+npm install
+npm run build
 ```
+
+Link into another package or point a `file:` dependency at the built output.
 
 ## Quick usage
 
 ```typescript
-import { getBalance, sendTokens, STACKS_TOOLS } from '@stacks/agent-core';
+import { getBalance, sendTokens, STACKS_TOOLS } from '@sugarhi11/agent-core';
 
 // Call a handler directly
 const balance = await getBalance({
@@ -84,7 +87,7 @@ Use `STACKS_TOOLS` when building a new framework adapter — map each entry to y
 ### Client utilities
 
 ```typescript
-import { apiUrl, stacksClient, resolveNetwork, fetchFn } from '@stacks/agent-core';
+import { apiUrl, stacksClient, resolveNetwork, fetchFn } from '@sugarhi11/agent-core';
 
 const url = apiUrl('testnet'); // https://api.testnet.hiro.so
 const network = resolveNetwork(); // 'mainnet'
@@ -93,6 +96,25 @@ const network = resolveNetwork(); // 'mainnet'
 ### Types
 
 All parameter and result interfaces live in `types.ts` — e.g. `GetBalanceParams`, `BalanceResult`, `SendTokensParams`, `BroadcastResult`.
+
+## Source layout
+
+```
+plugins/stacks/agent-core/
+├── src/
+│   ├── index.ts          STACKS_TOOLS registry + re-exports
+│   ├── types.ts          Parameter and result interfaces
+│   ├── client.ts         Hiro API helpers
+│   └── tools/
+│       ├── account.ts
+│       ├── stacking.ts
+│       ├── bns.ts
+│       ├── contracts.ts
+│       ├── swaps.ts
+│       └── bridge.ts
+├── dist/                 CJS + ESM build output
+└── package.json
+```
 
 ## Dependencies
 
@@ -107,6 +129,8 @@ Built on [stacks.js](https://github.com/blockstack/stacks.js):
 ## Build
 
 ```bash
-npm run build -w @stacks/agent-core   # CJS + ESM to dist/
-npm run typecheck -w @stacks/agent-core
+cd plugins/stacks/agent-core
+npm run build      # CJS + ESM to dist/
+npm run typecheck
+npm test           # Jest (passWithNoTests placeholder)
 ```
