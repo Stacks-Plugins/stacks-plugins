@@ -4,6 +4,8 @@ import { bnsActions } from './actions/bnsActions';
 import { contractActions } from './actions/contractActions';
 import { stackingActions } from './actions/stackingActions';
 import { swapActions } from './actions/swapActions';
+import { sbtcActions } from './actions/sbtcActions';
+import { zestActions } from './actions/zestActions';
 /**
  * ElizaOS plugin exposing the full Stacks agent toolset.
  *
@@ -13,4 +15,4 @@ import { swapActions } from './actions/swapActions';
  */
 export declare const stacksPlugin: Plugin;
 export default stacksPlugin;
-export { accountActions, stackingActions, bnsActions, contractActions, swapActions };
+export { accountActions, stackingActions, bnsActions, contractActions, swapActions, sbtcActions, zestActions, };
