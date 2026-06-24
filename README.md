@@ -1,6 +1,6 @@
 # Stacks Plugins
 
-AI agent plugins for the [Stacks](https://www.stacks.co/) blockchain. Expose balances, STX transfers, account history, PoX stacking, BNS naming, Clarity contracts, ALEX swaps, and Allbridge bridging to LLM agents through **ElizaOS**, **OpenClaw**, and **Hermes**.
+AI agent plugins for the [Stacks](https://www.stacks.co/) blockchain. Expose balances, STX transfers, account history, PoX stacking, BNS naming, Clarity contracts, ALEX swaps, Allbridge bridging, sBTC peg-in/out, and Zest yield to LLM agents through **ElizaOS**, **OpenClaw**, and **Hermes**.
 
 Documentation lives in [`docs/`](docs/) (Mintlify). Preview locally with `mintlify dev` from the `docs/` directory.
 
@@ -26,10 +26,9 @@ There is no root `package.json`. Each TypeScript package is built independently.
 
 | Package | Path | Role |
 | --- | --- | --- |
-| `@stacks/agent-core` | `plugins/stacks/agent-core` | Framework-agnostic tool handlers and `STACKS_TOOLS` registry (local source) |
-| `@sugarhi11/agent-core` | npm | Published build consumed by Eliza, OpenClaw, and Hermes adapters |
-| `plugin-eliza-stacks` | `plugins/stacks/eliza` | ElizaOS plugin — 19 actions + `STACKS_WALLET` provider |
-| `@stacks/openclaw-stacks` | `plugins/stacks/openclaw` | OpenClaw plugin — 19 core tools + `stacks_wallet_info` |
+| `@sugarhi11/agent-core` | `plugins/stacks/agent-core` | Framework-agnostic tool handlers and `STACKS_TOOLS` registry |
+| `plugin-eliza-stacks` | `plugins/stacks/eliza` | ElizaOS plugin — 33 actions + `STACKS_WALLET` provider |
+| `@stacks/openclaw-stacks` | `plugins/stacks/openclaw` | OpenClaw plugin — 33 core tools + `stacks_wallet_info` |
 | Hermes plugin | `plugins/stacks/hermes` | Python tool registration, hooks, `/stacks` command, bundled skills |
 
 ## Quick start
@@ -55,6 +54,8 @@ Set environment variables for wallet-aware agents:
 export STACKS_NETWORK=testnet
 export STACKS_SENDER_KEY=your_testnet_private_key_hex   # write tools only
 export STACKS_WALLET_ADDRESS=ST...                      # optional; derived from sender key if omitted
+export BITCOIN_PRIVATE_KEY=...                          # sBTC peg-in only
+export BITCOIN_ADDRESS=bc1...                           # sBTC peg-in only
 ```
 
 See [Configuration](docs/configuration.mdx) and [Quick start](docs/quickstart.mdx) for full setup.
@@ -69,7 +70,7 @@ See [Configuration](docs/configuration.mdx) and [Quick start](docs/quickstart.md
 
 ## Tool surface
 
-**19 tools** are defined in `@stacks/agent-core`'s `STACKS_TOOLS` registry (11 read, 8 write). ElizaOS and Hermes expose these 19 tools. OpenClaw adds **`stacks_wallet_info`** for wallet/network status (20 tools total).
+**33 tools** are defined in `@sugarhi11/agent-core`'s `STACKS_TOOLS` registry (17 read, 16 write). ElizaOS and Hermes expose these 33 tools. OpenClaw adds **`stacks_wallet_info`** for wallet/network status (34 tools total).
 
 Logic is implemented once in `agent-core`. Eliza and OpenClaw import handlers from `@sugarhi11/agent-core`. Hermes delegates every tool call to the same handlers through `hermes/scripts/stacks-bridge.mjs`.
 
