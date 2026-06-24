@@ -1,0 +1,166 @@
+---
+title: Zest tools
+description: Supply sBTC for yield and borrow against collateral on Zest Protocol v2.
+---
+
+# Zest Protocol tools
+
+Eight tools for [Zest Protocol](https://docs.zestprotocol.com/) v2 on Stacks: sBTC vault yield, market collateral, borrow, and repay.
+
+<Warning>
+  Zest mainnet has experienced pauses. Always call `stacks_zest_protocol_status` before writes. Borrowing carries liquidation risk.
+</Warning>
+
+## Mainnet contracts
+
+Deployer: `SP1A27KFY4XERQCCRCARCYD1CC5N7M6688BSYADJ7`
+
+<Note>
+  Zest contracts are **mainnet-only** in agent-core. Read tools work on testnet params but resolve mainnet contract IDs. Write tools require mainnet, sufficient sBTC/STX, and a vault that is not paused.
+</Note>
+
+| Contract | Name |
+| --- | --- |
+| Market | `v0-4-market` |
+| sBTC vault | `v0-vault-sbtc` |
+| Market vault | `v0-market-vault` |
+
+---
+
+## stacks_zest_sbtc_vault_info
+
+Read vault utilization, borrow APR, and available liquidity.
+
+**Type:** Read
+
+### Response
+
+```json
+{
+  "network": "mainnet",
+  "contract": "SP1A27KFY4XERQCCRCARCYD1CC5N7M6688BSYADJ7.v0-vault-sbtc",
+  "utilization": "...",
+  "interestRateBps": "...",
+  "availableAssets": "..."
+}
+```
+
+---
+
+## stacks_zest_protocol_status
+
+Read pause flags on the sBTC vault. Call before any Zest write.
+
+**Type:** Read
+
+---
+
+## stacks_zest_supply_sbtc
+
+Supply sBTC to the vault and receive zsBTC shares.
+
+**Type:** Write
+
+### Parameters
+
+<ParamField body="amount" type="string | number" required>
+  sBTC to supply (human or base units).
+</ParamField>
+
+<ParamField body="minOut" type="string | number">
+  Minimum zsBTC shares out (slippage guard, default `0`).
+</ParamField>
+
+<ParamField body="recipient" type="string">
+  Share recipient (defaults to signing address).
+</ParamField>
+
+---
+
+## stacks_zest_redeem_sbtc
+
+Redeem zsBTC shares for underlying sBTC.
+
+**Type:** Write
+
+### Parameters
+
+<ParamField body="shares" type="string | number" required>
+  zsBTC shares to redeem.
+</ParamField>
+
+<ParamField body="minUnderlying" type="string | number">
+  Minimum sBTC out (default `0`).
+</ParamField>
+
+---
+
+## stacks_zest_position
+
+Read collateral and debt for a Stacks address.
+
+**Type:** Read
+
+### Parameters
+
+<ParamField body="address" type="string">
+  Stacks address. Omit for agent wallet.
+</ParamField>
+
+---
+
+## stacks_zest_collateral_add_sbtc
+
+Post sBTC as borrow collateral on the market.
+
+**Type:** Write
+
+### Parameters
+
+<ParamField body="amount" type="string | number" required>
+  sBTC collateral amount.
+</ParamField>
+
+<ParamField body="priceFeedsHex" type="string[]">
+  Optional Pyth price feed blobs when required by the market.
+</ParamField>
+
+---
+
+## stacks_zest_borrow
+
+Borrow an asset against posted collateral.
+
+**Type:** Write
+
+### Parameters
+
+<ParamField body="assetContract" type="string" required>
+  Fungible token contract to borrow (e.g. `SP....token-name`).
+</ParamField>
+
+<ParamField body="amount" type="string | number" required>
+  Borrow amount in token base units.
+</ParamField>
+
+<ParamField body="receiver" type="string">
+  Optional recipient (defaults to caller).
+</ParamField>
+
+---
+
+## stacks_zest_repay
+
+Repay borrowed debt.
+
+**Type:** Write
+
+### Parameters
+
+<ParamField body="assetContract" type="string" required>
+  Debt token contract.
+</ParamField>
+
+<ParamField body="amount" type="string | number" required>
+  Repay amount.
+</ParamField>

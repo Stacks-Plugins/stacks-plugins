@@ -63,10 +63,14 @@ Edit `plugins/stacks/.env` (or set in `~/.hermes/.env` for Hermes):
 ```bash
 STACKS_NETWORK=testnet
 STACKS_SENDER_KEY=your_testnet_private_key_here
-# STACKS_WALLET_ADDRESS=ST...   # optional; derived from sender key if omitted
+# STACKS_WALLET_ADDRESS=ST...   # optional; derived from sender key on active network
+# BITCOIN_PRIVATE_KEY=...       # sBTC peg-in only
+# BITCOIN_ADDRESS=tb1...        # sBTC peg-in only
 ```
 
 See [Configuration](/configuration) for all environment variables.
+
+Optional smoke scripts under `scripts/sbtc-zest-smoke/` verify read-only tools, guard-rails, and adapter parity without an agent framework.
 
 ## 4. Run tests
 

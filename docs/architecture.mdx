@@ -78,9 +78,9 @@ All blockchain I/O goes through [stacks.js](https://github.com/blockstack/stacks
 
 | Framework | Adapter pattern | Tool count | Write tools |
 | --- | --- | --- | --- |
-| **ElizaOS** | Wraps handlers in `Action` objects via `makeAction()`; `STACKS_WALLET` provider | 19 | `senderKey` or `STACKS_SENDER_KEY` |
-| **OpenClaw** | Registers tools with TypeBox schemas via `defineToolPlugin()` | 20 (+ `stacks_wallet_info`) | Marked `optional: true` in manifest |
-| **Hermes** | Python handlers + Node subprocess bridge | 19 | `STACKS_SENDER_KEY` injected by bridge |
+| **ElizaOS** | Wraps handlers in `Action` objects via `makeAction()`; `STACKS_WALLET` provider | 33 | `senderKey` or `STACKS_SENDER_KEY` |
+| **OpenClaw** | Registers tools with TypeBox schemas via `defineToolPlugin()` | 34 (+ `stacks_wallet_info`) | Marked `optional: true` in manifest |
+| **Hermes** | Python handlers + Node subprocess bridge | 33 | `STACKS_SENDER_KEY` injected by bridge |
 
 ### ElizaOS
 
@@ -107,7 +107,7 @@ The plugin also registers:
 
 ## Tool contract
 
-Every framework exposes the **same 19 core tool names** (e.g. `stacks_get_balance`, `stacks_send_tokens`). OpenClaw adds `stacks_wallet_info`. Parameters and return shapes match agent-core types so agents can be ported between frameworks without retraining on different schemas.
+Every framework exposes the **same 33 core tool names** (e.g. `stacks_get_balance`, `stacks_send_sbtc`, `stacks_zest_supply_sbtc`). OpenClaw adds `stacks_wallet_info`. Parameters and return shapes match agent-core types so agents can be ported between frameworks without retraining on different schemas.
 
 See the [tool overview](/tools/overview) for the full list.
 

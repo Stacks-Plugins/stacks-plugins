@@ -5,7 +5,7 @@ description: AI agent plugins that give LLMs safe, structured access to the Stac
 
 # Stacks Plugins
 
-Stacks Plugins is a collection of **AI agent integrations** for the [Stacks](https://www.stacks.co/) blockchain. Each plugin exposes the same **19 core tools** — balances, STX transfers, account history, PoX stacking, BNS naming, Clarity contract calls, ALEX swaps, and Allbridge bridging — across three agent frameworks.
+Stacks Plugins is a collection of **AI agent integrations** for the [Stacks](https://www.stacks.co/) blockchain. Each plugin exposes the same **33 core tools** — balances, STX transfers, account history, PoX stacking, BNS naming, Clarity contract calls, ALEX swaps, Allbridge bridging, sBTC peg-in/out, and Zest yield — across three agent frameworks.
 
 Tool logic lives in **`@stacks/agent-core`** (`plugins/stacks/agent-core`). Framework adapters import the published npm package **`@sugarhi11/agent-core`**, which is built from that source.
 
@@ -14,7 +14,7 @@ Tool logic lives in **`@stacks/agent-core`** (`plugins/stacks/agent-core`). Fram
     Build the packages, configure your network, and wire up a framework plugin.
   </Card>
   <Card title="Tool reference" icon="wrench" href="/tools/overview">
-    Browse all 19 agent tools with parameters and examples.
+    Browse all 33 agent tools with parameters and examples.
   </Card>
   <Card title="ElizaOS" icon="puzzle-piece" href="/frameworks/eliza">
     Register `stacksPlugin` in your ElizaOS agent.
@@ -49,7 +49,7 @@ There is no root npm workspace. Each package under `plugins/stacks/` has its own
 | `@stacks/agent-core` | `plugins/stacks/agent-core` | Framework-agnostic tool implementations (local source) |
 | `@sugarhi11/agent-core` | npm | Published package consumed by framework adapters |
 | `plugin-eliza-stacks` | `plugins/stacks/eliza` | ElizaOS actions + `STACKS_WALLET` provider |
-| `@stacks/openclaw-stacks` | `plugins/stacks/openclaw` | OpenClaw tool plugin (19 core tools + `stacks_wallet_info`) |
+| `@stacks/openclaw-stacks` | `plugins/stacks/openclaw` | OpenClaw tool plugin (33 core tools + `stacks_wallet_info`) |
 | Hermes plugin | `plugins/stacks/hermes` | Python registration, hooks, `/stacks` command, bundled skills |
 
 ## Design principles

@@ -1,0 +1,45 @@
+---
+title: sBTC and Zest safety
+description: Testnet-first guidance for peg and DeFi agent tools.
+---
+
+# sBTC and Zest safety
+
+Agent tools that move BTC, sBTC, or Zest positions can cause irreversible loss. Follow these practices before enabling them in production agents.
+
+## Testnet first
+
+Configure `STACKS_NETWORK=testnet` and use testnet BTC/sBTC flows before mainnet. Verify transactions on [Hiro Explorer](https://explorer.hiro.so/) and Bitcoin testnet explorers.
+
+## sBTC on-Stacks transfers
+
+- **`stacks_send_sbtc`** recipients must be **Stacks addresses** (`ST…` / `SP…`), not Bitcoin `tb1…` or `bc1…` addresses.
+- Self-transfers are blocked — sending sBTC to the same address as the signer will fail on-chain.
+- Confirm recipient and amount with the user before broadcasting.
+
+## sBTC peg-in
+
+- Peg-in **spends real BTC**. Confirm amount and `stacksAddress` with the user.
+- Requires `BITCOIN_PRIVATE_KEY` and `BITCOIN_ADDRESS` server-side only.
+- Failed deposits may require a **reclaim** flow after the reclaim locktime.
+- Use `stacks_sbtc_build_peg_in` to preview the deposit address before `stacks_sbtc_initiate_peg_in`.
+
+## sBTC peg-out
+
+- Peg-out is **asynchronous**. BTC arrives after signer processing.
+- Poll status with `stacks_sbtc_get_peg_status` using the agent Stacks address.
+- Include a reasonable `maxFee` for peg-out; insufficient fees can stall withdrawal.
+- On **testnet**, peg-out may be unavailable if the `sbtc-withdrawal` contract is not deployed. Prefer mainnet for peg-out testing or use small on-Stacks `stacks_send_sbtc` transfers on testnet instead.
+
+## Zest Protocol
+
+- Call `stacks_zest_protocol_status` before supply, redeem, collateral, borrow, or repay.
+- Mainnet has had **protocol pauses**; refuse writes when pause flags are set.
+- Borrowing against sBTC collateral carries **liquidation risk** if prices move or health factor drops.
+- Some borrow/repay paths require Pyth `priceFeedsHex` when on-chain prices are stale.
+
+## Key hygiene
+
+- Never log or echo `STACKS_SENDER_KEY`, `BITCOIN_PRIVATE_KEY`, or user-supplied keys.
+- Never ask users to paste private keys into chat.
+- Use dedicated test wallets with limited funds for agent development.

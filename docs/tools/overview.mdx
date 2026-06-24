@@ -1,11 +1,11 @@
 ---
 title: Tool overview
-description: All 19 Stacks agent tools — read vs write, grouped by category.
+description: All 33 Stacks agent tools — read vs write, grouped by category.
 ---
 
 # Tool overview
 
-Every framework plugin exposes the same **19 core tools** defined in agent-core's `STACKS_TOOLS` registry. OpenClaw additionally registers **`stacks_wallet_info`** for wallet/network status.
+Every framework plugin exposes the same **33 core tools** defined in agent-core's `STACKS_TOOLS` registry. OpenClaw additionally registers **`stacks_wallet_info`** for wallet/network status.
 
 ## Tool index
 
@@ -30,15 +30,29 @@ Every framework plugin exposes the same **19 core tools** defined in agent-core'
 | `stacks_swap_execute` | Write | [Swaps & bridge](/tools/swaps-bridge) | Execute ALEX swap |
 | `stacks_bridge_quote` | Read | [Swaps & bridge](/tools/swaps-bridge) | Allbridge cross-chain quote |
 | `stacks_bridge_initiate` | Write | [Swaps & bridge](/tools/swaps-bridge) | Initiate bridge transfer |
+| `stacks_sbtc_get_balance` | Read | [sBTC](/tools/sbtc) | sBTC balance for a Stacks address |
+| `stacks_send_sbtc` | Write | [sBTC](/tools/sbtc) | Transfer sBTC on Stacks |
+| `stacks_sbtc_build_peg_in` | Read | [sBTC](/tools/sbtc) | Build peg-in deposit address |
+| `stacks_sbtc_initiate_peg_in` | Write | [sBTC](/tools/sbtc) | Peg BTC in (Bitcoin tx + Emily) |
+| `stacks_sbtc_initiate_peg_out` | Write | [sBTC](/tools/sbtc) | Initiate sBTC peg-out |
+| `stacks_sbtc_get_peg_status` | Read | [sBTC](/tools/sbtc) | Poll peg-in/out status |
+| `stacks_zest_sbtc_vault_info` | Read | [Zest](/tools/zest) | Vault utilization and APR |
+| `stacks_zest_protocol_status` | Read | [Zest](/tools/zest) | Pause flags |
+| `stacks_zest_supply_sbtc` | Write | [Zest](/tools/zest) | Supply sBTC for yield |
+| `stacks_zest_redeem_sbtc` | Write | [Zest](/tools/zest) | Redeem zsBTC shares |
+| `stacks_zest_position` | Read | [Zest](/tools/zest) | Collateral and debt snapshot |
+| `stacks_zest_collateral_add_sbtc` | Write | [Zest](/tools/zest) | Post sBTC collateral |
+| `stacks_zest_borrow` | Write | [Zest](/tools/zest) | Borrow against collateral |
+| `stacks_zest_repay` | Write | [Zest](/tools/zest) | Repay debt |
 
 ## Read vs write
 
 <CardGroup cols={2}>
-  <Card title="Read tools (11)" icon="magnifying-glass">
-    Query chain state via Hiro API or external quote APIs. No private key required.
+  <Card title="Read tools (17)" icon="magnifying-glass">
+    Query chain state via Hiro API, Emily, or external quote APIs. No private key required.
   </Card>
-  <Card title="Write tools (8)" icon="pen-to-square">
-    Sign and broadcast transactions. Require `senderKey` (or `STACKS_SENDER_KEY` for Hermes).
+  <Card title="Write tools (16)" icon="pen-to-square">
+    Sign and broadcast transactions. Require `senderKey` (or Bitcoin env for peg-in).
   </Card>
 </CardGroup>
 

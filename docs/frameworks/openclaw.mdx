@@ -31,9 +31,9 @@ npm run plugin:validate
 
 ## Tools
 
-OpenClaw exposes **20 tools**:
+OpenClaw exposes **34 tools**:
 
-- **19 core tools** from `@sugarhi11/agent-core` (`STACKS_TOOLS`)
+- **33 core tools** from `@sugarhi11/agent-core` (`STACKS_TOOLS`), including sBTC and Zest
 - **`stacks_wallet_info`** — shows configured wallet address, network, and signing status (OpenClaw-specific)
 
 ## Plugin manifest
@@ -71,6 +71,14 @@ Tools that sign transactions are registered with `{ optional: true }` in `toolMe
 - `stacks_contract_call`
 - `stacks_swap_execute`
 - `stacks_bridge_initiate`
+- `stacks_send_sbtc`
+- `stacks_sbtc_initiate_peg_in`
+- `stacks_sbtc_initiate_peg_out`
+- `stacks_zest_supply_sbtc`
+- `stacks_zest_redeem_sbtc`
+- `stacks_zest_collateral_add_sbtc`
+- `stacks_zest_borrow`
+- `stacks_zest_repay`
 
 This lets agents run in **read-only mode** by default. Enable write tools only when the agent has authorization to sign.
 
@@ -97,7 +105,7 @@ cd plugins/stacks/openclaw
 npm test
 ```
 
-Vitest verifies all 20 registered tool names including `stacks_wallet_info`.
+Vitest verifies all 34 registered tool names including `stacks_wallet_info`.
 
 ## Example tool invocation
 

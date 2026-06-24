@@ -5,7 +5,7 @@ description: Python Hermes plugin with a Node bridge to @sugarhi11/agent-core.
 
 # Hermes plugin
 
-The Hermes plugin (`plugins/stacks/hermes`) exposes the same **19 core Stacks tools** to Python-based Hermes agents. Every tool call — read and write — delegates to `@sugarhi11/agent-core` through a Node.js subprocess bridge.
+The Hermes plugin (`plugins/stacks/hermes`) exposes the same **33 core Stacks tools** to Python-based Hermes agents. Every tool call — read and write — delegates to `@sugarhi11/agent-core` through a Node.js subprocess bridge.
 
 ## Installation
 
@@ -44,7 +44,9 @@ No pip packages are required — see `requirements.txt`.
 | --- | --- |
 | `STACKS_NETWORK` | `mainnet` or `testnet` — injected into tool params when omitted |
 | `STACKS_SENDER_KEY` | Hex private key for write tools — injected when `senderKey` is absent |
-| `STACKS_WALLET_ADDRESS` | Optional explicit wallet address |
+| `STACKS_WALLET_ADDRESS` | Optional explicit wallet address (derived from sender key on the active network when omitted) |
+| `BITCOIN_PRIVATE_KEY` | WIF or hex Bitcoin key for sBTC peg-in |
+| `BITCOIN_ADDRESS` | Bitcoin address holding UTXOs for peg-in |
 
 Read-only tools work without `STACKS_SENDER_KEY`. Write tools register a `check_fn` that verifies signing is configured before the handler runs.
 
@@ -83,7 +85,7 @@ A legacy write-only script (`stacks-write.mjs`) remains for backward compatibili
 
 ## Plugin features
 
-Beyond the 19 tools, the Hermes plugin registers:
+Beyond the 33 tools, the Hermes plugin registers:
 
 | Feature | Description |
 | --- | --- |
@@ -106,6 +108,14 @@ These tools require Node.js 22+ on `PATH` and `STACKS_SENDER_KEY`:
 | `stacks_contract_call` | Clarity contract call |
 | `stacks_swap_execute` | Execute ALEX swap |
 | `stacks_bridge_initiate` | Start bridge transfer |
+| `stacks_send_sbtc` | Transfer sBTC on Stacks |
+| `stacks_sbtc_initiate_peg_in` | Peg BTC in (requires Bitcoin env vars) |
+| `stacks_sbtc_initiate_peg_out` | Initiate sBTC peg-out |
+| `stacks_zest_supply_sbtc` | Supply sBTC to Zest vault |
+| `stacks_zest_redeem_sbtc` | Redeem zsBTC shares |
+| `stacks_zest_collateral_add_sbtc` | Post sBTC collateral |
+| `stacks_zest_borrow` | Borrow against collateral |
+| `stacks_zest_repay` | Repay Zest debt |
 
 ## Tool schemas
 

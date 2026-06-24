@@ -13,7 +13,9 @@ Configure network targeting and transaction signing through environment variable
 | --- | --- | --- | --- |
 | `STACKS_NETWORK` | No | See below | Target network: `mainnet` or `testnet` |
 | `STACKS_SENDER_KEY` | For write tools | — | Hex-encoded private key used to sign transactions |
-| `STACKS_WALLET_ADDRESS` | No | Derived from sender key | Explicit agent wallet address when sender key is set |
+| `STACKS_WALLET_ADDRESS` | No | Derived from sender key on active network | Explicit agent wallet address when sender key is set |
+| `BITCOIN_PRIVATE_KEY` | Peg-in only | — | WIF or hex Bitcoin key for sBTC peg-in |
+| `BITCOIN_ADDRESS` | Peg-in only | — | Bitcoin address holding UTXOs for peg-in |
 
 Create your local env file from the example:
 
@@ -26,7 +28,19 @@ Example `.env` for testnet development:
 ```bash
 STACKS_NETWORK=testnet
 STACKS_SENDER_KEY=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b85501
+# BITCOIN_PRIVATE_KEY=...   # peg-in only (WIF or hex)
+# BITCOIN_ADDRESS=tb1...      # peg-in only
 ```
+
+To derive Leather-compatible keys locally without committing secrets:
+
+```bash
+# From repo root (PowerShell example)
+$env:MNEMONIC="your 24 words"; $env:STACKS_NETWORK="testnet"
+node scripts/derive-leather-env.mjs
+```
+
+Copy the printed values into `plugins/stacks/.env` or `~/.hermes/.env`.
 
 For Hermes, set these in `~/.hermes/.env`.
 
@@ -93,6 +107,8 @@ No API key is required for public Hiro endpoints at default rate limits. For pro
 | --- | --- | --- |
 | ALEX DEX | `stacks_swap_quote`, `stacks_swap_execute` | `https://api.alexgo.io` |
 | Allbridge Core | `stacks_bridge_quote`, `stacks_bridge_initiate` | `https://core.api.allbridgecoreapi.net` |
+| Emily / sBTC API | `stacks_sbtc_*` | Network-specific sBTC Emily endpoints via `sbtc` SDK |
+| Zest v2 contracts | `stacks_zest_*` | On-chain read/call via Hiro API |
 
 Swap and bridge tools are primarily oriented toward **mainnet** liquidity.
 
@@ -112,4 +128,4 @@ Write tools accept these common signing fields:
 
 ## Wallet aliases
 
-Eliza and Hermes resolve friendly address aliases (`"my wallet"`, `"me"`, `"agent wallet"`) to the configured agent wallet address derived from `STACKS_SENDER_KEY` or `STACKS_WALLET_ADDRESS`.
+Eliza and Hermes resolve friendly address aliases (`"my wallet"`, `"me"`, `"agent wallet"`) to the configured agent wallet address. When `STACKS_SENDER_KEY` is set, the address is **derived for the active network** (`mainnet` vs `testnet`) unless `STACKS_WALLET_ADDRESS` overrides it.

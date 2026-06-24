@@ -37,7 +37,7 @@ The plugin exports:
 export const stacksPlugin: Plugin = {
   name: 'stacks',
   description: 'Stacks blockchain tools: balances, STX transfers, ...',
-  actions: [/* 19 actions */],
+  actions: [/* 33 actions */],
   providers: [stacksWalletProvider],
 };
 ```
@@ -56,7 +56,7 @@ STACKS_WALLET_ADDRESS=ST...    # optional; derived from sender key
 
 ## Available actions
 
-All 19 actions share the `stacks_*` naming convention from agent-core. Each action includes **similes** — alternative intent phrases the model can match:
+All 33 actions share the `stacks_*` naming convention from agent-core, including six sBTC tools and eight Zest tools. Each action includes **similes** — alternative intent phrases the model can match:
 
 | Action | Example similes |
 | --- | --- |
@@ -100,6 +100,8 @@ import {
   bnsActions,
   contractActions,
   swapActions,
+  sbtcActions,
+  zestActions,
 } from 'plugin-eliza-stacks';
 ```
 
@@ -108,7 +110,7 @@ import {
 | Package | Version |
 | --- | --- |
 | `@elizaos/core` | `>=1.7.0` |
-| `@sugarhi11/agent-core` | `^0.1.0` (bundled dependency) |
+| `@sugarhi11/agent-core` | `^0.2.0` (bundled dependency) |
 
 <Note>
   ElizaOS actions return handler results as-is (JSON objects). Wrap sensitive write actions with confirmation flows in your agent logic.
