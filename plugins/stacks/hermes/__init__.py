@@ -8,10 +8,11 @@ blockchain. All tools delegate to @sugarhi11/agent-core via the Node bridge.
 from __future__ import annotations
 
 import logging
+import os
 from pathlib import Path
 
 from . import schemas, tools
-from .shared import WRITE_TOOLS
+from .shared import BITCOIN_WRITE_TOOLS, WRITE_TOOLS
 from .wallet import has_sender_key, wallet_context_text
 
 logger = logging.getLogger(__name__)
@@ -38,6 +39,20 @@ _TOOLS = [
     (schemas.SWAP_EXECUTE_SCHEMA, tools.swap_execute),
     (schemas.BRIDGE_QUOTE_SCHEMA, tools.bridge_quote),
     (schemas.BRIDGE_INITIATE_SCHEMA, tools.bridge_initiate),
+    (schemas.SBTC_BALANCE_SCHEMA, tools.sbtc_get_balance),
+    (schemas.SEND_SBTC_SCHEMA, tools.send_sbtc),
+    (schemas.SBTC_BUILD_PEG_IN_SCHEMA, tools.sbtc_build_peg_in),
+    (schemas.SBTC_INITIATE_PEG_IN_SCHEMA, tools.sbtc_initiate_peg_in),
+    (schemas.SBTC_INITIATE_PEG_OUT_SCHEMA, tools.sbtc_initiate_peg_out),
+    (schemas.SBTC_PEG_STATUS_SCHEMA, tools.sbtc_get_peg_status),
+    (schemas.ZEST_VAULT_INFO_SCHEMA, tools.zest_sbtc_vault_info),
+    (schemas.ZEST_PROTOCOL_STATUS_SCHEMA, tools.zest_protocol_status),
+    (schemas.ZEST_SUPPLY_SBTC_SCHEMA, tools.zest_supply_sbtc),
+    (schemas.ZEST_REDEEM_SBTC_SCHEMA, tools.zest_redeem_sbtc),
+    (schemas.ZEST_POSITION_SCHEMA, tools.zest_position),
+    (schemas.ZEST_COLLATERAL_ADD_SCHEMA, tools.zest_collateral_add_sbtc),
+    (schemas.ZEST_BORROW_SCHEMA, tools.zest_borrow),
+    (schemas.ZEST_REPAY_SCHEMA, tools.zest_repay),
 ]
 
 _STACKS_STATUS_HELP = """\
@@ -45,7 +60,8 @@ _STACKS_STATUS_HELP = """\
 
 Shows the configured network, agent wallet address, and whether signing is
 ready. Read-only tools work without STACKS_SENDER_KEY; write tools (send,
-stack, delegate, contract calls, swaps, bridge) require it in ~/.hermes/.env.
+stack, delegate, contract calls, swaps, bridge, sBTC, Zest) require it in ~/.hermes/.env.
+Bitcoin peg-in additionally requires BITCOIN_PRIVATE_KEY and BITCOIN_ADDRESS.
 
 Usage:
   /stacks          Show wallet/network status
@@ -55,6 +71,13 @@ Usage:
 
 def _check_write_tools_available() -> bool:
     return has_sender_key()
+
+
+def _check_bitcoin_tools_available() -> bool:
+    return bool(
+        os.environ.get("BITCOIN_PRIVATE_KEY", "").strip()
+        and os.environ.get("BITCOIN_ADDRESS", "").strip()
+    )
 
 
 def _on_post_tool_call(
@@ -97,7 +120,9 @@ def register(ctx) -> None:
             handler=handler,
             description=schema["description"],
             check_fn=(
-                _check_write_tools_available
+                _check_bitcoin_tools_available
+                if schema["name"] in BITCOIN_WRITE_TOOLS
+                else _check_write_tools_available
                 if schema["name"] in WRITE_TOOLS
                 else None
             ),

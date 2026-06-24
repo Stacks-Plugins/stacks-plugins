@@ -56,12 +56,14 @@ def _derive_address_from_key(key: str, network: str) -> str | None:
 
 
 def get_wallet_address() -> str | None:
+    key = os.environ.get("STACKS_SENDER_KEY", "").strip()
+    if key:
+        derived = _derive_address_from_key(key, get_network())
+        if derived:
+            return derived
     address = os.environ.get("STACKS_WALLET_ADDRESS", "").strip()
     if address:
         return address
-    key = os.environ.get("STACKS_SENDER_KEY", "").strip()
-    if key:
-        return _derive_address_from_key(key, get_network())
     return None
 
 
@@ -91,5 +93,7 @@ def wallet_context_text() -> str:
         "For stacks_get_balance you may omit `address` to use the agent wallet.",
         "For write tools omit `senderKey` — it is injected automatically. Confirm sends before broadcasting.",
         "Amounts: users speak in STX (e.g. 1 STX = 1000000 microSTX). Convert before calling send.",
+        "sBTC amounts use 8 decimals; peg-in requires BITCOIN_PRIVATE_KEY and BITCOIN_ADDRESS.",
+        "Check stacks_zest_protocol_status before Zest supply/borrow/repay writes.",
     ]
     return "\n".join(lines)

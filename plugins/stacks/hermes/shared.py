@@ -11,9 +11,11 @@ from .params import normalize_send_params, parse_stx_amount, require_send_params
 from .wallet import get_network, has_sender_key, resolve_address
 from .bridge import run_ts_tool
 
-WRITE_TOOLS = frozenset(
+BROADCAST_TOOLS = frozenset(
     {
         "stacks_send_tokens",
+        "stacks_send_sbtc",
+        "stacks_sbtc_initiate_peg_out",
         "stacks_stack",
         "stacks_delegate_stx",
         "stacks_revoke_delegate",
@@ -21,8 +23,17 @@ WRITE_TOOLS = frozenset(
         "stacks_contract_call",
         "stacks_swap_execute",
         "stacks_bridge_initiate",
+        "stacks_zest_supply_sbtc",
+        "stacks_zest_redeem_sbtc",
+        "stacks_zest_collateral_add_sbtc",
+        "stacks_zest_borrow",
+        "stacks_zest_repay",
     }
 )
+
+WRITE_TOOLS = BROADCAST_TOOLS
+
+BITCOIN_WRITE_TOOLS = frozenset({"stacks_sbtc_initiate_peg_in"})
 
 PARSE_AMOUNT_TOOLS = frozenset(
     {
@@ -38,6 +49,16 @@ OPTIONAL_ADDRESS_TOOLS = frozenset(
         "stacks_get_balance",
         "stacks_get_account_history",
         "stacks_stacking_status",
+        "stacks_sbtc_get_balance",
+        "stacks_zest_position",
+    }
+)
+
+STACKS_ADDRESS_TOOLS = frozenset(
+    {
+        "stacks_sbtc_build_peg_in",
+        "stacks_sbtc_initiate_peg_in",
+        "stacks_sbtc_get_peg_status",
     }
 )
 
@@ -52,10 +73,39 @@ def enrich_params(tool_name: str, params: dict[str, Any]) -> dict[str, Any]:
         resolved = resolve_address(enriched.get("address"))
         if resolved:
             enriched["address"] = resolved
-        elif tool_name in {"stacks_get_balance", "stacks_get_account_history"}:
+        elif tool_name in {"stacks_get_balance", "stacks_get_account_history", "stacks_sbtc_get_balance", "stacks_zest_position"}:
             raise ValueError(
                 "No wallet address configured. Set STACKS_SENDER_KEY or STACKS_WALLET_ADDRESS in .env."
             )
+
+    if "stacksAddress" in enriched or tool_name in STACKS_ADDRESS_TOOLS:
+        resolved = resolve_address(enriched.get("stacksAddress"))
+        if resolved:
+            enriched["stacksAddress"] = resolved
+        elif tool_name in {"stacks_sbtc_build_peg_in", "stacks_sbtc_initiate_peg_in"}:
+            fallback = resolve_address(None)
+            if fallback:
+                enriched["stacksAddress"] = fallback
+            elif tool_name == "stacks_sbtc_build_peg_in":
+                raise ValueError(
+                    "stacksAddress is required. Set STACKS_SENDER_KEY or pass stacksAddress explicitly."
+                )
+
+    if tool_name == "stacks_sbtc_initiate_peg_in" and not enriched.get("senderKey") and has_sender_key():
+        enriched["senderKey"] = os.environ["STACKS_SENDER_KEY"]
+
+    if tool_name == "stacks_send_sbtc":
+        wallet_addr = resolve_address(None)
+        recipient = resolve_address(enriched.get("recipient"))
+        if recipient:
+            enriched["recipient"] = recipient
+        if wallet_addr and recipient == wallet_addr:
+            raise ValueError(
+                "Recipient cannot equal sender: sBTC self-transfers fail post-conditions (SentEq 0). "
+                "Use a different Stacks address."
+            )
+        if not enriched.get("recipient"):
+            raise ValueError("recipient is required for stacks_send_sbtc.")
 
     if tool_name in WRITE_TOOLS:
         if not enriched.get("senderKey") and has_sender_key():
