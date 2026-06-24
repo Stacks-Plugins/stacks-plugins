@@ -32,9 +32,9 @@ export async function contractCall(params: ContractCallParams): Promise<Broadcas
     functionArgs: decodeArgs(params.functionArgsHex),
     senderKey: params.senderKey,
     network,
-    fee: params.fee != null ? BigInt(params.fee) : undefined,
-    nonce: params.nonce != null ? BigInt(params.nonce) : undefined,
   };
+  if (params.fee != null) txOptions.fee = BigInt(params.fee);
+  if (params.nonce != null) txOptions.nonce = BigInt(params.nonce);
 
   const transaction = await makeContractCall(txOptions);
   const result = await broadcastTransaction({ transaction, network });

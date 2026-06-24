@@ -8,6 +8,7 @@ const bns_1 = require("@stacks/bns");
 const network_1 = require("@stacks/network");
 const transactions_1 = require("@stacks/transactions");
 const client_1 = require("../client");
+/** Sign an unsigned BNS transaction with the sender key and broadcast it. */
 async function signAndBroadcast(transaction, senderKey, network) {
     const signer = new transactions_1.TransactionSigner(transaction);
     signer.signOrigin(senderKey);
@@ -18,6 +19,7 @@ async function signAndBroadcast(transaction, senderKey, network) {
     }
     return { txid: result.txid, success: true };
 }
+/** Resolve a BNS name to its owner address and zonefile. */
 async function resolveName(params) {
     const network = (0, client_1.resolveNetwork)(params.network);
     const url = `${(0, client_1.apiUrl)(network)}/v1/names/${encodeURIComponent(params.name)}`;
@@ -39,6 +41,7 @@ async function resolveName(params) {
         found: true,
     };
 }
+/** List all BNS names owned by a Stacks address. */
 async function lookupAddress(params) {
     const network = (0, client_1.resolveNetwork)(params.network);
     const url = `${(0, client_1.apiUrl)(network)}/v1/addresses/stacks/${params.address}`;
@@ -49,6 +52,7 @@ async function lookupAddress(params) {
     const json = await res.json();
     return { address: params.address, network, names: json.names ?? [] };
 }
+/** Get the registration price (in microSTX) for a BNS name. */
 async function getNamePrice(params) {
     const network = (0, client_1.resolveNetwork)(params.network);
     const amount = await (0, bns_1.getNamePrice)({
@@ -57,6 +61,7 @@ async function getNamePrice(params) {
     });
     return { name: params.name, network, amount: amount.toString() };
 }
+/** Transfer ownership of a BNS name to another address (`name-transfer`). */
 async function transferName(params) {
     const network = (0, client_1.resolveNetwork)(params.network);
     const publicKey = (0, transactions_1.publicKeyToHex)((0, transactions_1.privateKeyToPublic)(params.senderKey));
@@ -69,4 +74,3 @@ async function transferName(params) {
     });
     return signAndBroadcast(transaction, params.senderKey, network);
 }
-//# sourceMappingURL=bns.js.map

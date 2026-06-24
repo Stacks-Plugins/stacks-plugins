@@ -54,9 +54,9 @@ export async function sendTokens(params: SendTokensParams): Promise<BroadcastRes
     senderKey: params.senderKey,
     network,
     memo: params.memo,
-    fee: params.fee != null ? BigInt(params.fee) : undefined,
-    nonce: params.nonce != null ? BigInt(params.nonce) : undefined,
   };
+  if (params.fee != null) txOptions.fee = BigInt(params.fee);
+  if (params.nonce != null) txOptions.nonce = BigInt(params.nonce);
 
   const transaction = await makeSTXTokenTransfer(txOptions);
   const result = await broadcastTransaction({ transaction, network });
