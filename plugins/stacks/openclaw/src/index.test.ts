@@ -23,6 +23,20 @@ const EXPECTED_TOOLS = [
   'stacks_swap_execute',
   'stacks_bridge_quote',
   'stacks_bridge_initiate',
+  'stacks_sbtc_get_balance',
+  'stacks_send_sbtc',
+  'stacks_sbtc_build_peg_in',
+  'stacks_sbtc_initiate_peg_in',
+  'stacks_sbtc_initiate_peg_out',
+  'stacks_sbtc_get_peg_status',
+  'stacks_zest_sbtc_vault_info',
+  'stacks_zest_protocol_status',
+  'stacks_zest_supply_sbtc',
+  'stacks_zest_redeem_sbtc',
+  'stacks_zest_position',
+  'stacks_zest_collateral_add_sbtc',
+  'stacks_zest_borrow',
+  'stacks_zest_repay',
 ];
 
 describe('stacks', () => {
@@ -45,6 +59,14 @@ describe('stacks', () => {
         'stacks_contract_call',
         'stacks_swap_execute',
         'stacks_bridge_initiate',
+        'stacks_send_sbtc',
+        'stacks_sbtc_initiate_peg_in',
+        'stacks_sbtc_initiate_peg_out',
+        'stacks_zest_supply_sbtc',
+        'stacks_zest_redeem_sbtc',
+        'stacks_zest_collateral_add_sbtc',
+        'stacks_zest_borrow',
+        'stacks_zest_repay',
       ])
     );
   });

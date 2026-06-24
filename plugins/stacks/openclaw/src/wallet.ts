@@ -106,5 +106,7 @@ export function walletContextText(pluginConfig?: { defaultNetwork?: string }): s
     'For stacks_get_balance you may omit `address` to use the agent wallet.',
     'For write tools omit `senderKey` — it is injected automatically. Confirm sends before broadcasting.',
     'Amounts: users speak in STX (e.g. 1 STX = 1000000 microSTX). Convert before calling send.',
+    'sBTC amounts use 8 decimals; recipient must differ from sender for stacks_send_sbtc.',
+    'Bitcoin peg-in requires BITCOIN_PRIVATE_KEY and BITCOIN_ADDRESS. Check stacks_zest_protocol_status before Zest writes.',
   ].join('\n');
 }

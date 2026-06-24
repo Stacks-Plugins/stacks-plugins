@@ -1,7 +1,7 @@
 {
   "id": "stacks",
   "name": "Stacks Plugin",
-  "description": "Stacks blockchain tools: balances, STX transfers, account history, stacking/PoX, BNS naming, Clarity contract calls, ALEX swaps, and bridging.",
+  "description": "Stacks blockchain tools: balances, STX transfers, account history, stacking/PoX, BNS naming, Clarity contract calls, ALEX swaps, bridging, sBTC peg-in/out, and Zest yield.",
   "activation": {
     "onStartup": true
   },
@@ -45,7 +45,21 @@
       "stacks_swap_quote",
       "stacks_swap_execute",
       "stacks_bridge_quote",
-      "stacks_bridge_initiate"
+      "stacks_bridge_initiate",
+      "stacks_sbtc_get_balance",
+      "stacks_send_sbtc",
+      "stacks_sbtc_build_peg_in",
+      "stacks_sbtc_initiate_peg_in",
+      "stacks_sbtc_initiate_peg_out",
+      "stacks_sbtc_get_peg_status",
+      "stacks_zest_sbtc_vault_info",
+      "stacks_zest_protocol_status",
+      "stacks_zest_supply_sbtc",
+      "stacks_zest_redeem_sbtc",
+      "stacks_zest_position",
+      "stacks_zest_collateral_add_sbtc",
+      "stacks_zest_borrow",
+      "stacks_zest_repay"
     ]
   },
   "toolMetadata": {
@@ -71,6 +85,30 @@
       "optional": true
     },
     "stacks_bridge_initiate": {
+      "optional": true
+    },
+    "stacks_send_sbtc": {
+      "optional": true
+    },
+    "stacks_sbtc_initiate_peg_in": {
+      "optional": true
+    },
+    "stacks_sbtc_initiate_peg_out": {
+      "optional": true
+    },
+    "stacks_zest_supply_sbtc": {
+      "optional": true
+    },
+    "stacks_zest_redeem_sbtc": {
+      "optional": true
+    },
+    "stacks_zest_collateral_add_sbtc": {
+      "optional": true
+    },
+    "stacks_zest_borrow": {
+      "optional": true
+    },
+    "stacks_zest_repay": {
       "optional": true
     }
   }
