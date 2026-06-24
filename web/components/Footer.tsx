@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { docsUrl, SITE } from "@/lib/content";
 
 export function Footer() {
@@ -11,12 +10,14 @@ export function Footer() {
           © {year} {SITE.name}. Built on Stacks.
         </p>
         <div className="flex flex-wrap gap-6">
-          <Link
+          <a
             href={docsUrl("/")}
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-sm font-medium text-stacks-black/70 transition-colors hover:text-stacks-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stacks-purple"
           >
             Documentation
-          </Link>
+          </a>
           <a
             href={SITE.githubUrl}
             target="_blank"
