@@ -67,13 +67,7 @@ async function main() {
   }
 
   const meta = META[tool];
-  if (meta?.requiresBitcoinKey) {
-    if (!process.env.BITCOIN_PRIVATE_KEY && !process.env.BITCOIN_ADDRESS) {
-      fail(
-        'Bitcoin peg-in requires BITCOIN_PRIVATE_KEY and BITCOIN_ADDRESS in the environment.'
-      );
-    }
-  } else if (meta?.write) {
+  if (meta?.write) {
     if (!params.senderKey && process.env.STACKS_SENDER_KEY) {
       params.senderKey = process.env.STACKS_SENDER_KEY;
     }
