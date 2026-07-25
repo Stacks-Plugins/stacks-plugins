@@ -3,7 +3,7 @@ import {
   lookupAddress,
   resolveName,
   transferName,
-} from '@sugarhi11/agent-core';
+} from '@stacks/agent-core';
 import type { Action } from '@elizaos/core';
 import { makeAction } from '../shared';
 

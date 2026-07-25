@@ -3,7 +3,7 @@ import {
   bridgeQuote,
   swapExecute,
   swapQuote,
-} from '@sugarhi11/agent-core';
+} from '@stacks/agent-core';
 import type { Action } from '@elizaos/core';
 import { makeAction } from '../shared';
 
