@@ -22,13 +22,11 @@ export function getStacksWalletConfig(): StacksWalletConfig {
   const senderKey = process.env.STACKS_SENDER_KEY?.trim();
   let address = process.env.STACKS_WALLET_ADDRESS?.trim();
 
-  if (senderKey) {
+  if (!address && senderKey) {
     try {
       address = privateKeyToAddress(senderKey, network);
     } catch {
-      if (!address) {
-        address = undefined;
-      }
+      address = undefined;
     }
   }
 

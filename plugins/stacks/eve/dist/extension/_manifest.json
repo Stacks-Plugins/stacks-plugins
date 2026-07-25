@@ -1,0 +1,12 @@
+{
+  "kind": "eve-extension",
+  "formatVersion": 1,
+  "builtWithEve": "0.27.6",
+  "requires": {
+    "extension": 1,
+    "tool": 2,
+    "skill": 1,
+    "instructions": 1,
+    "config": 1
+  }
+}

@@ -1,7 +1,7 @@
 {
   "name": "plugin-eliza-stacks",
   "version": "0.1.0",
-  "description": "ElizaOS plugin exposing Stacks blockchain tools (balance, transfers, stacking, BNS, contracts, swaps) via @sugarhi11/agent-core.",
+  "description": "ElizaOS plugin exposing Stacks blockchain tools (balance, transfers, stacking, BNS, contracts, swaps) via @stacks/agent-core.",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,15 +11,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@stacks/transactions": "^7.4.0",
-    "@sugarhi11/agent-core": "0.2.0"
+    "@stacks/agent-core": "0.1.0"
   },
   "peerDependencies": {
-    "@elizaos/core": ">=1.7.0"
+    "@elizaos/core": ">=0.1.0"
   },
   "devDependencies": {
-    "@elizaos/core": "1.7.2",
-    "@types/node": "^22.10.0",
+    "@elizaos/core": "^0.1.9",
     "typescript": "^5.9.3"
   },
   "agentConfig": {

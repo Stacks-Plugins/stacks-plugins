@@ -1,0 +1,47 @@
+{
+  "name": "@stacks/eve-stacks",
+  "version": "0.1.0",
+  "description": "eve extension exposing Stacks blockchain tools (balance, transfers, stacking, BNS, contracts, swaps) via @stacks/agent-core.",
+  "type": "module",
+  "license": "MIT",
+  "eve": {
+    "extension": {
+      "source": "./extension",
+      "dist": "./dist/extension"
+    }
+  },
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.mjs"
+    },
+    "./tools": {
+      "types": "./dist/tools/index.d.ts",
+      "default": "./dist/tools/index.mjs"
+    }
+  },
+  "scripts": {
+    "postinstall": "node ./scripts/patch-eve-windows-imports.mjs",
+    "prebuild": "node ./scripts/patch-eve-windows-imports.mjs",
+    "build": "eve extension build",
+    "prepare": "node ./scripts/patch-eve-windows-imports.mjs && eve extension build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@stacks/agent-core": "file:../agent-core",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "eve": "^0.27.6",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "eve": "*"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "keywords": ["eve", "extension", "stacks", "blockchain", "agent"]
+}
