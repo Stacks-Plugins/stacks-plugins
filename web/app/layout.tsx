@@ -14,11 +14,11 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stacks Plugins — AI Agent Integrations for Stacks",
+  title: "Stacks Plugins | AI Agent Integrations for Stacks",
   description:
     "AI agent plugins for the Stacks blockchain. Expose balances, transfers, stacking, BNS, Clarity contracts, swaps, and bridging through ElizaOS, OpenClaw, and Hermes.",
   icons: {
-    icon: "/favicon.svg",
+    icon: "/logos/stacks.png",
   },
 };
 

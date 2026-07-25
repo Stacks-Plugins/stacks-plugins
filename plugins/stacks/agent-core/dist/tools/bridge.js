@@ -3,7 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.bridgeQuote = bridgeQuote;
 exports.bridgeInitiate = bridgeInitiate;
 const client_1 = require("../client");
+/** Base URL for the Allbridge Core public API (supports Stacks via Core). */
 const ALLBRIDGE_API = 'https://core.api.allbridgecoreapi.net';
+/**
+ * Get a cross-chain bridge quote.
+ *
+ * Uses the Allbridge Core public API to estimate the received amount for a
+ * token bridged between two supported chains (including Stacks).
+ */
 async function bridgeQuote(params) {
     const url = `${ALLBRIDGE_API}/swap?amount=${params.amount}` +
         `&fromChain=${encodeURIComponent(params.fromChain)}` +
@@ -25,9 +32,18 @@ async function bridgeQuote(params) {
         provider: 'allbridge-core',
     };
 }
+/**
+ * Initiate a cross-chain bridge transfer.
+ *
+ * Bridge initiation requires a protocol-specific signed contract call on the
+ * source chain (and, for Stacks, the Allbridge bridge contract). Because the
+ * exact contract, function, and Clarity arguments depend on the live Allbridge
+ * deployment and selected route, this is intentionally not auto-broadcast.
+ * Use the generic `contractCall` tool with arguments derived from the quote, or
+ * wire the Allbridge SDK for full execution.
+ */
 async function bridgeInitiate(_params) {
     throw new Error('bridgeInitiate is not auto-executed. Fetch a quote with `bridgeQuote`, then ' +
         'build the source-chain bridge transaction with the `contractCall` tool ' +
         '(Stacks side) or the Allbridge SDK for non-Stacks source chains.');
 }
-//# sourceMappingURL=bridge.js.map

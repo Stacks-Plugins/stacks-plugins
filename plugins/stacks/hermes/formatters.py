@@ -68,7 +68,24 @@ def format_balance(result: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def format_send_result(result: dict[str, Any], network: str) -> str:
+def format_sbtc_balance(result: dict[str, Any]) -> str:
+    base = str(result.get("sbtc", "0"))
+    try:
+        units = int(base)
+        human = units / 100_000_000
+        amount = f"{human:.8f}".rstrip("0").rstrip(".")
+        human_text = f"{amount} sBTC"
+    except (TypeError, ValueError):
+        human_text = base
+    return "\n".join(
+        [
+            f"sBTC balance for {result.get('address')} ({result.get('network')})",
+            f"{human_text} ({base} base units)",
+        ]
+    )
+
+
+def format_send_result(result: dict[str, Any], network: str, label: str = "Transfer") -> str:
     if result.get("success") and result.get("txid"):
         txid = result["txid"]
         tx_id = txid[2:] if txid.startswith("0x") else txid
@@ -77,18 +94,35 @@ def format_send_result(result: dict[str, Any], network: str) -> str:
             if network == "testnet"
             else f"https://explorer.hiro.so/txid/{tx_id}"
         )
-        return f"Transfer submitted successfully.\nTxID: {txid}\nExplorer: {explorer}"
+        return f"{label} submitted successfully.\nTxID: {txid}\nExplorer: {explorer}"
     err = result.get("error", "unknown")
     reason = result.get("reason")
     suffix = f" ({reason})" if reason else ""
-    return f"Transfer failed: {err}{suffix}"
+    return f"{label} failed: {err}{suffix}"
 
 
 def format_tool_result(tool_name: str, result: Any, network: str) -> str:
     if tool_name == "stacks_get_balance" and isinstance(result, dict):
         return format_balance(result)
+    if tool_name == "stacks_sbtc_get_balance" and isinstance(result, dict):
+        return format_sbtc_balance(result)
     if tool_name == "stacks_send_tokens" and isinstance(result, dict):
-        return format_send_result(result, network)
+        return format_send_result(result, network, "STX transfer")
+    if tool_name == "stacks_send_sbtc" and isinstance(result, dict):
+        return format_send_result(result, network, "sBTC transfer")
+    if tool_name.startswith("stacks_zest_") and isinstance(result, dict) and "success" in result:
+        return format_send_result(result, network, "Zest transaction")
+    if tool_name in {
+        "stacks_sbtc_initiate_peg_out",
+        "stacks_stack",
+        "stacks_delegate_stx",
+        "stacks_revoke_delegate",
+        "stacks_transfer_name",
+        "stacks_contract_call",
+        "stacks_swap_execute",
+        "stacks_bridge_initiate",
+    } and isinstance(result, dict):
+        return format_send_result(result, network, "Transaction")
     if tool_name == "stacks_get_account_history" and isinstance(result, dict):
         return format_account_history(result)
     if isinstance(result, str):

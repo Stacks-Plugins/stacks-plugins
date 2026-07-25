@@ -1,28 +1,35 @@
 {
-  "name": "@stacks/agent-core",
-  "version": "0.1.0",
-  "description": "Framework-agnostic Stacks blockchain tools for AI agents (balance, transactions, stacking, BNS, contracts, swaps, bridging).",
+  "name": "@sugarhi11/agent-core",
+  "version": "0.2.0",
+  "description": "Framework-agnostic Stacks blockchain tools for AI agents (balance, transactions, stacking, BNS, contracts, swaps, bridging, sBTC, Zest).",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",
   "homepage": "https://hiro.so/stacks-js",
   "scripts": {
     "build": "npm run clean && npm run build:cjs && npm run build:esm",
-    "build:cjs": "tsc -b tsconfig.build.json",
+    "build:cjs": "tsc -p tsconfig.build.json",
     "build:esm": "tsc -p tsconfig.build.json --module ES6 --outDir ./dist/esm",
-    "clean": "rimraf dist && tsc -b tsconfig.build.json --clean",
+    "clean": "rimraf dist",
     "pack": "npm pack",
-    "test": "jest --passWithNoTests",
+    "prepublishOnly": "npm run build && npm test",
+    "test": "node --test tests/*.test.mjs",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "npm run typecheck -- --watch"
   },
   "dependencies": {
+    "@noble/hashes": "^1.8.0",
+    "@scure/base": "^1.2.6",
+    "@scure/btc-signer": "^1.8.1",
     "@stacks/bns": "^7.4.0",
     "@stacks/common": "^7.3.1",
     "@stacks/network": "^7.3.1",
     "@stacks/stacking": "^7.4.0",
-    "@stacks/transactions": "^7.4.0"
+    "@stacks/transactions": "^7.4.0",
+    "bitcoin-address-validation": "^3.0.0",
+    "sbtc": "^0.3.2"
   },
   "devDependencies": {
+    "@types/node": "^22.10.0",
     "rimraf": "^3.0.2"
   },
   "sideEffects": false,
@@ -47,5 +54,8 @@
   },
   "bugs": {
     "url": "https://github.com/blockstack/stacks.js/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

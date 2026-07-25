@@ -2,10 +2,11 @@ name: stacks
 version: "0.1.0"
 description: >-
   Stacks blockchain tools for Hermes agents: balances, account history,
-  stacking/PoX, BNS naming, Clarity contracts, ALEX swaps, and bridging.
-  Read-only tools work out of the box; write tools require STACKS_SENDER_KEY.
-  All tools delegate to @sugarhi11/agent-core via a Node.js bridge
-  (requires Node 22+ and npm install in plugins/stacks/).
+  stacking/PoX, BNS naming, Clarity contracts, ALEX swaps, bridging, sBTC
+  peg-in/out, and Zest yield. Read-only tools work out of the box; write tools
+  require STACKS_SENDER_KEY. Peg-in requires BITCOIN_PRIVATE_KEY and
+  BITCOIN_ADDRESS. All tools delegate to @sugarhi11/agent-core via a Node.js
+  bridge (requires Node 22+ and npm install in plugins/stacks/).
 author: NousResearch
 kind: standalone
 provides_tools:
@@ -28,6 +29,20 @@ provides_tools:
   - stacks_swap_execute
   - stacks_bridge_quote
   - stacks_bridge_initiate
+  - stacks_sbtc_get_balance
+  - stacks_send_sbtc
+  - stacks_sbtc_build_peg_in
+  - stacks_sbtc_initiate_peg_in
+  - stacks_sbtc_initiate_peg_out
+  - stacks_sbtc_get_peg_status
+  - stacks_zest_sbtc_vault_info
+  - stacks_zest_protocol_status
+  - stacks_zest_supply_sbtc
+  - stacks_zest_redeem_sbtc
+  - stacks_zest_position
+  - stacks_zest_collateral_add_sbtc
+  - stacks_zest_borrow
+  - stacks_zest_repay
 provides_hooks:
   - pre_llm_call
   - post_tool_call

@@ -8,6 +8,7 @@ const client_1 = require("../client");
 function decodeArgs(functionArgsHex) {
     return (functionArgsHex ?? []).map(hex => (0, transactions_1.deserializeCV)(hex));
 }
+/** Build, sign, and broadcast a public Clarity contract function call. */
 async function contractCall(params) {
     const network = (0, client_1.resolveNetwork)(params.network);
     const txOptions = {
@@ -17,9 +18,11 @@ async function contractCall(params) {
         functionArgs: decodeArgs(params.functionArgsHex),
         senderKey: params.senderKey,
         network,
-        fee: params.fee != null ? BigInt(params.fee) : undefined,
-        nonce: params.nonce != null ? BigInt(params.nonce) : undefined,
     };
+    if (params.fee != null)
+        txOptions.fee = BigInt(params.fee);
+    if (params.nonce != null)
+        txOptions.nonce = BigInt(params.nonce);
     const transaction = await (0, transactions_1.makeContractCall)(txOptions);
     const result = await (0, transactions_1.broadcastTransaction)({ transaction, network });
     if ('error' in result) {
@@ -28,6 +31,7 @@ async function contractCall(params) {
     }
     return { txid: result.txid, success: true };
 }
+/** Evaluate a read-only Clarity contract function and return its decoded result. */
 async function readOnlyCall(params) {
     const network = (0, client_1.resolveNetwork)(params.network);
     const senderAddress = params.senderAddress ?? params.contractAddress;
@@ -42,8 +46,8 @@ async function readOnlyCall(params) {
     });
     return { value: (0, transactions_1.cvToJSON)(result), hex: (0, transactions_1.serializeCV)(result) };
 }
+/** Decode a hex-encoded serialized Clarity value into readable JSON. */
 function decodeCv(params) {
     const cv = (0, transactions_1.deserializeCV)(params.hex);
     return { value: (0, transactions_1.cvToJSON)(cv), hex: params.hex };
 }
-//# sourceMappingURL=contracts.js.map

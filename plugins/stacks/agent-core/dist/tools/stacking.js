@@ -16,6 +16,7 @@ function toBroadcastResult(result) {
     }
     return { txid: result.txid, success: true };
 }
+/** Get the current stacking (PoX lock) status for an account, including delegation info. */
 async function getStackingStatus(params) {
     const network = (0, client_1.resolveNetwork)(params.network);
     const client = clientFor(params.address, network);
@@ -34,6 +35,7 @@ async function getStackingStatus(params) {
         delegation: delegationInfo,
     };
 }
+/** Check whether an account is eligible to stack a given amount for a number of cycles. */
 async function canStack(params) {
     const network = (0, client_1.resolveNetwork)(params.network);
     const client = clientFor(params.address, network);
@@ -48,10 +50,14 @@ async function canStack(params) {
         reason: result.reason,
     };
 }
+/** Lock STX for stacking (solo). Builds, signs, and broadcasts the `stack-stx` call. */
 async function stack(params) {
     const network = (0, client_1.resolveNetwork)(params.network);
+    // Derive the stacker address from the private key via a throwaway client is not
+    // straightforward here; the caller supplies the signing key and the client only
+    // needs a network. StackingClient signs using the provided privateKey.
     const client = new stacking_1.StackingClient({
-        address: params.poxAddress,
+        address: params.poxAddress, // address field is informational for signing flows
         network,
         client: (0, client_1.stacksClient)(network),
     });
@@ -67,6 +73,7 @@ async function stack(params) {
     });
     return toBroadcastResult(result);
 }
+/** Delegate STX to a stacking pool/operator (`delegate-stx`). */
 async function delegateStx(params) {
     const network = (0, client_1.resolveNetwork)(params.network);
     const client = new stacking_1.StackingClient({
@@ -85,6 +92,7 @@ async function delegateStx(params) {
     });
     return toBroadcastResult(result);
 }
+/** Revoke an active stacking delegation (`revoke-delegate-stx`). */
 async function revokeDelegate(params) {
     const network = (0, client_1.resolveNetwork)(params.network);
     const client = new stacking_1.StackingClient({
@@ -99,4 +107,3 @@ async function revokeDelegate(params) {
     });
     return toBroadcastResult(result);
 }
-//# sourceMappingURL=stacking.js.map

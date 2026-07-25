@@ -1,0 +1,182 @@
+---
+title: sBTC tools
+description: Transfer sBTC on Stacks and peg BTC in or out via the official sBTC bridge.
+---
+
+# sBTC tools
+
+Six tools for sBTC balances, on-Stacks transfers, and Bitcoin peg-in/out via the [sBTC](https://docs.stacks.co/more-guides/sbtc/bridging-bitcoin/btc-to-sbtc) bridge and Emily API.
+
+<Warning>
+  Peg-in spends real BTC on Bitcoin L1. Peg-out locks sBTC on Stacks and delivers BTC asynchronously. Test on **testnet** with small amounts first.
+</Warning>
+
+## Environment variables
+
+| Variable | Required for | Description |
+| --- | --- | --- |
+| `STACKS_SENDER_KEY` | send, peg-out | Signs Stacks transactions |
+| `BITCOIN_PRIVATE_KEY` | peg-in | WIF or 32-byte hex BTC key |
+| `BITCOIN_ADDRESS` | peg-in | UTXO source and change address |
+
+See [Configuration](/configuration) for full env setup.
+
+## Mainnet contracts
+
+| Contract | Address |
+| --- | --- |
+| sBTC token | `SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token` |
+| sBTC withdrawal | `SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-withdrawal` |
+
+## Testnet contracts
+
+| Contract | Address |
+| --- | --- |
+| sBTC token | `ST1F7QA2MDF17S807EPA36TSS8AMEFY4KA9TVGWXT.sbtc-token` |
+| sBTC registry | `ST1F7QA2MDF17S807EPA36TSS8AMEFY4KA9TVGWXT.sbtc-registry` |
+
+<Note>
+  On testnet, **`stacks_send_sbtc`** and balance reads work against the testnet sBTC token. **`stacks_sbtc_initiate_peg_out`** may fail with `NoSuchContract` because the withdrawal contract is not fully deployed on testnet. Peg-in depends on Emily testnet infrastructure and testnet BTC UTXOs.
+</Note>
+
+---
+
+## stacks_sbtc_get_balance
+
+Get sBTC balance for a Stacks address.
+
+**Type:** Read
+
+### Parameters
+
+<ParamField body="address" type="string">
+  Stacks address. Omit to use the agent wallet.
+</ParamField>
+
+<ParamField body="network" type="string">
+  `mainnet` or `testnet`.
+</ParamField>
+
+### Response
+
+```json
+{
+  "address": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM",
+  "network": "mainnet",
+  "sbtc": "100000000"
+}
+```
+
+`sbtc` is in base units (8 decimals).
+
+---
+
+## stacks_send_sbtc
+
+Transfer sBTC on Stacks via the SIP-010 `transfer` function.
+
+**Type:** Write
+
+### Parameters
+
+<ParamField body="recipient" type="string" required>
+  Destination **Stacks** address (`ST…` or `SP…`). Bitcoin `tb1…` / `bc1…` addresses are not valid recipients — use peg-out for BTC withdrawals.
+</ParamField>
+
+<ParamField body="amount" type="string | number" required>
+  Human sBTC/BTC amount (e.g. `"0.001"`) or base units.
+</ParamField>
+
+<ParamField body="memo" type="string">
+  Optional transfer memo (max 34 bytes).
+</ParamField>
+
+<Warning>
+  Self-transfers (sender equals recipient) are rejected — the sBTC token post-condition fails when sending to your own address.
+</Warning>
+
+---
+
+## stacks_sbtc_build_peg_in
+
+Build a peg-in deposit address and scripts without broadcasting Bitcoin.
+
+**Type:** Read
+
+### Parameters
+
+<ParamField body="stacksAddress" type="string">
+  Stacks address that receives minted sBTC. Defaults to agent wallet when omitted.
+</ParamField>
+
+<ParamField body="maxSignerFee" type="number">
+  Max signer fee in satoshis (default `80000`).
+</ParamField>
+
+<ParamField body="reclaimLockTime" type="number">
+  Bitcoin blocks before reclaim is allowed (default `950`).
+</ParamField>
+
+---
+
+## stacks_sbtc_initiate_peg_in
+
+Sign and broadcast a Bitcoin deposit transaction and notify Emily.
+
+**Type:** Write (requires Bitcoin env vars, not `STACKS_SENDER_KEY` alone)
+
+### Parameters
+
+<ParamField body="amount" type="string | number" required>
+  BTC amount to peg in (human or satoshis).
+</ParamField>
+
+<ParamField body="stacksAddress" type="string">
+  Recipient on Stacks. Derived from `STACKS_SENDER_KEY` when omitted.
+</ParamField>
+
+<ParamField body="feeRate" type="number">
+  Bitcoin fee rate. Defaults to Emily `medium` estimate.
+</ParamField>
+
+---
+
+## stacks_sbtc_initiate_peg_out
+
+Initiate withdrawal of sBTC for BTC on Bitcoin L1.
+
+**Type:** Write
+
+### Parameters
+
+<ParamField body="amount" type="string | number" required>
+  sBTC amount to withdraw.
+</ParamField>
+
+<ParamField body="bitcoinRecipient" type="string" required>
+  Destination Bitcoin address (bech32, P2SH, or P2PKH).
+</ParamField>
+
+<ParamField body="maxFee" type="string | number">
+  Maximum peg-out fee in sBTC base units (default `3000`).
+</ParamField>
+
+---
+
+## stacks_sbtc_get_peg_status
+
+Poll Emily for peg-in deposit status or list peg-out withdrawals.
+
+**Type:** Read
+
+### Parameters
+
+<ParamField body="bitcoinTxid" type="string">
+  Bitcoin txid for peg-in status (with optional `vout`, default `0`).
+</ParamField>
+
+<ParamField body="stacksAddress" type="string">
+  Stacks sender address for peg-out withdrawal list.
+</ParamField>
+
+Provide **either** `bitcoinTxid` **or** `stacksAddress`.

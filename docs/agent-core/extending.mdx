@@ -5,7 +5,7 @@ description: Add new tools or build a custom framework adapter on top of STACKS_
 
 # Extending agent-core
 
-This guide covers adding tools to `@stacks/agent-core` and wiring them into framework adapters.
+This guide covers adding tools to agent-core and wiring them into framework adapters.
 
 ## Adding a new tool
 
@@ -41,8 +41,11 @@ This guide covers adding tools to `@stacks/agent-core` and wiring them into fram
   </Step>
   <Step title="Update framework adapters">
     - **ElizaOS**: add an action in the matching `actions/*.ts` file
-    - **OpenClaw**: register with TypeBox schema in `openclaw/src/index.ts`
-    - **Hermes**: add handler in `tools.py`, schema in `schemas.py`, and update `WRITE_TOOL_NAMES` in `bridge.py` if it's a write tool
+    - **OpenClaw**: add a tool spec in `openclaw/src/tools.ts` and update `openclaw.plugin.json`
+    - **Hermes**: add handler in `tools.py`, schema in `schemas.py`, and register in `__init__.py`; update `WRITE_TOOLS` in `shared.py` if it's a write tool
+  </Step>
+  <Step title="Publish">
+    Bump and publish `@sugarhi11/agent-core` so adapters pick up the new handler, or use a local `file:` dependency during development.
   </Step>
 </Steps>
 
@@ -57,7 +60,7 @@ This guide covers adding tools to `@stacks/agent-core` and wiring them into fram
 Use `STACKS_TOOLS` as your source of truth:
 
 ```typescript
-import { STACKS_TOOLS } from '@stacks/agent-core';
+import { STACKS_TOOLS } from '@sugarhi11/agent-core';
 
 function registerStacksTools(registerFn: (tool: ToolDef) => void) {
   for (const { name, description, handler, write } of STACKS_TOOLS) {
@@ -73,6 +76,8 @@ function registerStacksTools(registerFn: (tool: ToolDef) => void) {
 
 Map `write: true` tools to your framework's privileged/signed-tool path.
 
+For Hermes-style bridges, dispatch through `stacks-bridge.mjs` — it already iterates `STACKS_TOOLS` and requires no per-tool wiring in the script.
+
 ## Write tool checklist
 
 When adding a write tool:
@@ -81,19 +86,17 @@ When adding a write tool:
 2. Use `@stacks/transactions` for signing and broadcasting
 3. Return `BroadcastResult` with `txid` and `success`
 4. Mark `write: true` in `STACKS_TOOLS`
-5. Add to Hermes `WRITE_TOOL_NAMES` and `stacks-write.mjs` dispatch
-6. Mark as `optional: true` in `openclaw.plugin.json` if applicable
+5. Add to Hermes `WRITE_TOOLS` in `shared.py` and register a `check_fn` in `__init__.py`
+6. Mark as `optional: true` in `openclaw.plugin.json` `toolMetadata`
 
 ## Testing
 
-Run the integration test script after changes:
+After changes, rebuild and run adapter tests:
 
 ```bash
-npm run build -w @stacks/agent-core
-node scripts/test-agent-plugins.mjs
+cd plugins/stacks/agent-core && npm run build
+cd ../openclaw && npm test
 ```
-
-Add targeted tests for new handlers in `agent-core` when the test suite grows.
 
 <Tip>
   Prefer read-only tools where possible. Agents are safer when they query chain state without holding signing keys.

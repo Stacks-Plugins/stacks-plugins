@@ -276,3 +276,206 @@ BRIDGE_INITIATE_SCHEMA = {
         ["fromChain", "toChain", "token", "amount", "recipient"],
     ),
 }
+
+# --- sBTC ---
+SBTC_BALANCE_SCHEMA = {
+    "name": "stacks_sbtc_get_balance",
+    "description": (
+        "Get sBTC balance for a Stacks address (8-decimal base units). Omit `address` for the agent wallet. "
+        "Params: { address?, network? }."
+    ),
+    "parameters": _obj({"address": {"type": "string"}, "network": _NETWORK}),
+}
+
+SEND_SBTC_SCHEMA = {
+    "name": "stacks_send_sbtc",
+    "description": (
+        "Transfer sBTC on Stacks via sbtc-token SIP-010. Recipient must differ from sender (no self-transfers). "
+        "senderKey is auto-injected. Params: { recipient, amount, memo?, network? }."
+    ),
+    "parameters": _obj(
+        {
+            "recipient": {"type": "string"},
+            "amount": {"type": "string", "description": "sBTC/BTC amount or base units"},
+            "memo": {"type": "string"},
+            "network": _NETWORK,
+        },
+        ["recipient", "amount"],
+    ),
+}
+
+SBTC_BUILD_PEG_IN_SCHEMA = {
+    "name": "stacks_sbtc_build_peg_in",
+    "description": (
+        "Build sBTC peg-in deposit address without broadcasting Bitcoin. "
+        "Params: { stacksAddress?, maxSignerFee?, reclaimLockTime?, network? }."
+    ),
+    "parameters": _obj(
+        {
+            "stacksAddress": {"type": "string"},
+            "maxSignerFee": {"type": "integer"},
+            "reclaimLockTime": {"type": "integer"},
+            "network": _NETWORK,
+        }
+    ),
+}
+
+SBTC_INITIATE_PEG_IN_SCHEMA = {
+    "name": "stacks_sbtc_initiate_peg_in",
+    "description": (
+        "Peg BTC into sBTC: broadcast Bitcoin deposit and notify Emily. "
+        "Requires BITCOIN_PRIVATE_KEY and BITCOIN_ADDRESS in env. "
+        "Params: { amount, stacksAddress?, feeRate?, network? }."
+    ),
+    "parameters": _obj(
+        {
+            "amount": {"type": "string", "description": "BTC/sBTC amount or satoshis"},
+            "stacksAddress": {"type": "string"},
+            "feeRate": {"type": "number"},
+            "maxSignerFee": {"type": "integer"},
+            "network": _NETWORK,
+        },
+        ["amount"],
+    ),
+}
+
+SBTC_INITIATE_PEG_OUT_SCHEMA = {
+    "name": "stacks_sbtc_initiate_peg_out",
+    "description": (
+        "Initiate sBTC peg-out (withdraw sBTC for BTC). senderKey is auto-injected. "
+        "Params: { amount, bitcoinRecipient, maxFee?, network? }."
+    ),
+    "parameters": _obj(
+        {
+            "amount": {"type": "string"},
+            "bitcoinRecipient": {"type": "string"},
+            "maxFee": {"type": "string"},
+            "network": _NETWORK,
+        },
+        ["amount", "bitcoinRecipient"],
+    ),
+}
+
+SBTC_PEG_STATUS_SCHEMA = {
+    "name": "stacks_sbtc_get_peg_status",
+    "description": (
+        "Query Emily for peg-in deposit (bitcoinTxid) or peg-out withdrawals (stacksAddress). "
+        "Params: { bitcoinTxid?, vout?, stacksAddress?, network? }."
+    ),
+    "parameters": _obj(
+        {
+            "bitcoinTxid": {"type": "string"},
+            "vout": {"type": "integer"},
+            "stacksAddress": {"type": "string"},
+            "network": _NETWORK,
+        }
+    ),
+}
+
+# --- Zest ---
+ZEST_VAULT_INFO_SCHEMA = {
+    "name": "stacks_zest_sbtc_vault_info",
+    "description": "Read Zest vault-sbtc utilization, borrow APR, and available liquidity. Params: { network? }.",
+    "parameters": _obj({"network": _NETWORK}),
+}
+
+ZEST_PROTOCOL_STATUS_SCHEMA = {
+    "name": "stacks_zest_protocol_status",
+    "description": "Read Zest vault pause flags before attempting writes. Params: { network? }.",
+    "parameters": _obj({"network": _NETWORK}),
+}
+
+ZEST_SUPPLY_SBTC_SCHEMA = {
+    "name": "stacks_zest_supply_sbtc",
+    "description": (
+        "Supply sBTC to Zest vault-sbtc for yield. Check pause state first. senderKey is auto-injected. "
+        "Params: { amount, minOut?, recipient?, network? }."
+    ),
+    "parameters": _obj(
+        {
+            "amount": {"type": "string"},
+            "minOut": {"type": "string"},
+            "recipient": {"type": "string"},
+            "network": _NETWORK,
+        },
+        ["amount"],
+    ),
+}
+
+ZEST_REDEEM_SBTC_SCHEMA = {
+    "name": "stacks_zest_redeem_sbtc",
+    "description": (
+        "Redeem zsBTC shares from Zest vault-sbtc. senderKey is auto-injected. "
+        "Params: { shares, minUnderlying?, recipient?, network? }."
+    ),
+    "parameters": _obj(
+        {
+            "shares": {"type": "string"},
+            "minUnderlying": {"type": "string"},
+            "recipient": {"type": "string"},
+            "network": _NETWORK,
+        },
+        ["shares"],
+    ),
+}
+
+ZEST_POSITION_SCHEMA = {
+    "name": "stacks_zest_position",
+    "description": (
+        "Read Zest market position (collateral and debt) for a Stacks address. "
+        "Params: { address?, network? }."
+    ),
+    "parameters": _obj({"address": {"type": "string"}, "network": _NETWORK}),
+}
+
+ZEST_COLLATERAL_ADD_SCHEMA = {
+    "name": "stacks_zest_collateral_add_sbtc",
+    "description": (
+        "Post sBTC as Zest market collateral. senderKey is auto-injected. "
+        "Params: { amount, assetContract?, priceFeedsHex?, network? }."
+    ),
+    "parameters": _obj(
+        {
+            "amount": {"type": "string"},
+            "assetContract": {"type": "string"},
+            "priceFeedsHex": {"type": "array", "items": {"type": "string"}},
+            "network": _NETWORK,
+        },
+        ["amount"],
+    ),
+}
+
+ZEST_BORROW_SCHEMA = {
+    "name": "stacks_zest_borrow",
+    "description": (
+        "Borrow from Zest market against collateral. senderKey is auto-injected. "
+        "Params: { assetContract, amount, receiver?, priceFeedsHex?, network? }."
+    ),
+    "parameters": _obj(
+        {
+            "assetContract": {"type": "string"},
+            "amount": {"type": "string"},
+            "receiver": {"type": "string"},
+            "priceFeedsHex": {"type": "array", "items": {"type": "string"}},
+            "network": _NETWORK,
+        },
+        ["assetContract", "amount"],
+    ),
+}
+
+ZEST_REPAY_SCHEMA = {
+    "name": "stacks_zest_repay",
+    "description": (
+        "Repay Zest market debt. senderKey is auto-injected. "
+        "Params: { assetContract, amount, priceFeedsHex?, network? }."
+    ),
+    "parameters": _obj(
+        {
+            "assetContract": {"type": "string"},
+            "amount": {"type": "string"},
+            "priceFeedsHex": {"type": "array", "items": {"type": "string"}},
+            "network": _NETWORK,
+        },
+        ["assetContract", "amount"],
+    ),
+}

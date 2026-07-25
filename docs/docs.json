@@ -2,7 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "name": "Stacks Plugins",
   "theme": "mint",
-  "description": "AI agent plugins for the Stacks blockchain — balances, transfers, stacking, BNS, Clarity contracts, swaps, and bridging.",
+  "description": "AI agent plugins for the Stacks blockchain — balances, transfers, stacking, BNS, Clarity contracts, swaps, bridging, sBTC, and Zest yield.",
   "colors": {
     "primary": "#5546FF",
     "light": "#7B6FFF",
@@ -56,7 +56,15 @@
           "tools/stacking",
           "tools/bns",
           "tools/contracts",
-          "tools/swaps-bridge"
+          "tools/swaps-bridge",
+          "tools/sbtc",
+          "tools/zest"
+        ]
+      },
+      {
+        "group": "Safety",
+        "pages": [
+          "safety/sbtc-zest"
         ]
       }
     ]

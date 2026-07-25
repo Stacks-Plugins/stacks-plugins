@@ -11,8 +11,11 @@ Configure network targeting and transaction signing through environment variable
 
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
-| `STACKS_NETWORK` | Hermes: yes | `mainnet` | Target network: `mainnet` or `testnet` |
-| `STACKS_SENDER_KEY` | For write tests / Hermes writes | — | Hex-encoded private key used to sign transactions |
+| `STACKS_NETWORK` | No | See below | Target network: `mainnet` or `testnet` |
+| `STACKS_SENDER_KEY` | For write tools | — | Hex-encoded private key used to sign transactions |
+| `STACKS_WALLET_ADDRESS` | No | Derived from sender key on active network | Explicit agent wallet address when sender key is set |
+| `BITCOIN_PRIVATE_KEY` | Peg-in only | — | WIF or hex Bitcoin key for sBTC peg-in |
+| `BITCOIN_ADDRESS` | Peg-in only | — | Bitcoin address holding UTXOs for peg-in |
 
 Create your local env file from the example:
 
@@ -25,7 +28,21 @@ Example `.env` for testnet development:
 ```bash
 STACKS_NETWORK=testnet
 STACKS_SENDER_KEY=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b85501
+# BITCOIN_PRIVATE_KEY=...   # peg-in only (WIF or hex)
+# BITCOIN_ADDRESS=tb1...      # peg-in only
 ```
+
+To derive Leather-compatible keys locally without committing secrets:
+
+```bash
+# From repo root (PowerShell example)
+$env:MNEMONIC="your 24 words"; $env:STACKS_NETWORK="testnet"
+node scripts/derive-leather-env.mjs
+```
+
+Copy the printed values into `plugins/stacks/.env` or `~/.hermes/.env`.
+
+For Hermes, set these in `~/.hermes/.env`.
 
 <Warning>
   `STACKS_SENDER_KEY` grants full control of the associated wallet. Use a dedicated testnet wallet for development. Never commit this value or pass it through untrusted agent prompts.
@@ -44,14 +61,14 @@ Every tool accepts an optional `network` parameter that overrides the default:
 
 | Framework | Default when omitted |
 | --- | --- |
-| `@stacks/agent-core` | `mainnet` |
-| ElizaOS | `mainnet` |
+| `@sugarhi11/agent-core` handlers | `mainnet` |
+| ElizaOS | `testnet` (via `STACKS_NETWORK` env, then fallback) |
 | OpenClaw | `mainnet` (configurable via `defaultNetwork` in plugin config) |
-| Hermes | `STACKS_NETWORK` env var, then `mainnet` |
+| Hermes | `STACKS_NETWORK` env var injected by bridge, then handler default |
 
 ## OpenClaw plugin config
 
-The OpenClaw manifest (`openclaw.plugin.json`) supports a `defaultNetwork` setting:
+The OpenClaw manifest (`openclaw.plugin.json`) supports a `defaultNetwork` setting via `configSchema`:
 
 ```json
 {
@@ -63,20 +80,17 @@ Write tools are registered as **optional** in OpenClaw. Enable them only when yo
 
 ## Hermes requirements
 
-The Hermes plugin declares required env vars in `plugin.yaml`:
+The Hermes plugin (`plugin.yaml`) documents that write tools require `STACKS_SENDER_KEY`. Read-only tools work without a sender key; write tools are gated by a `check_fn` when signing is unavailable.
 
-```yaml
-requires_env:
-  - STACKS_NETWORK
-  - STACKS_SENDER_KEY
-```
+**Runtime requirements:**
 
-For write tools, Hermes injects `STACKS_SENDER_KEY` into the payload when `senderKey` is not provided explicitly in tool params.
+- Node.js 22+ on `PATH`
+- `npm install` in `plugins/stacks/hermes/` (installs `@sugarhi11/agent-core` for the bridge)
+- `STACKS_NETWORK` and `STACKS_SENDER_KEY` in `~/.hermes/.env` (or the process environment)
 
-**Additional Hermes requirements:**
+The Node bridge runs with `cwd` set to `plugins/stacks/hermes/` and loads `@sugarhi11/agent-core` from `hermes/node_modules`.
 
-- Node.js 22+ on `PATH` (for the write bridge)
-- Built `@stacks/agent-core` in the repo (the bridge runs from repo root)
+For write tools, the bridge injects `STACKS_SENDER_KEY` into params when `senderKey` is not provided explicitly.
 
 ## Hiro API endpoints
 
@@ -93,6 +107,8 @@ No API key is required for public Hiro endpoints at default rate limits. For pro
 | --- | --- | --- |
 | ALEX DEX | `stacks_swap_quote`, `stacks_swap_execute` | `https://api.alexgo.io` |
 | Allbridge Core | `stacks_bridge_quote`, `stacks_bridge_initiate` | `https://core.api.allbridgecoreapi.net` |
+| Emily / sBTC API | `stacks_sbtc_*` | Network-specific sBTC Emily endpoints via `sbtc` SDK |
+| Zest v2 contracts | `stacks_zest_*` | On-chain read/call via Hiro API |
 
 Swap and bridge tools are primarily oriented toward **mainnet** liquidity.
 
@@ -109,3 +125,7 @@ Write tools accept these common signing fields:
 <Tip>
   Let the SDK estimate `fee` and `nonce` during development. Override them only when you need deterministic transaction ordering or custom fee rates.
 </Tip>
+
+## Wallet aliases
+
+Eliza and Hermes resolve friendly address aliases (`"my wallet"`, `"me"`, `"agent wallet"`) to the configured agent wallet address. When `STACKS_SENDER_KEY` is set, the address is **derived for the active network** (`mainnet` vs `testnet`) unless `STACKS_WALLET_ADDRESS` overrides it.

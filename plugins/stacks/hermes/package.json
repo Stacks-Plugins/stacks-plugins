@@ -4,6 +4,6 @@
   "private": true,
   "description": "Node.js dependencies for the Hermes Stacks write bridge (@sugarhi11/agent-core).",
   "dependencies": {
-    "@sugarhi11/agent-core": "^0.1.0"
+    "@sugarhi11/agent-core": "0.2.0"
   }
 }

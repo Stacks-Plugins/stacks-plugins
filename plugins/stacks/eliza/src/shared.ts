@@ -14,6 +14,11 @@ import {
 } from './wallet';
 import { formatAccountHistory } from './formatters';
 import {
+  BROADCAST_RESULT_TOOLS,
+  formatBroadcastResult,
+  formatSbtcBalanceResult,
+} from './broadcastFormat';
+import {
   normalizeSendParams,
   requireSendParams,
   resolveParamsFromMessage,
@@ -60,14 +65,70 @@ function enrichParams(
     enriched.network = wallet.network;
   }
 
-  if ('address' in enriched || spec.name.includes('balance') || spec.name.includes('history') || spec.name.includes('stacking_status')) {
+  const needsAddress =
+    'address' in enriched ||
+    spec.name.includes('balance') ||
+    spec.name.includes('history') ||
+    spec.name.includes('stacking_status') ||
+    spec.name === 'stacks_zest_position';
+
+  if (needsAddress) {
     const resolved = resolveStacksAddress(enriched.address as string | undefined);
     if (resolved) {
       enriched.address = resolved;
-    } else if (spec.name.includes('balance') || spec.name.includes('history')) {
+    } else if (
+      spec.name.includes('balance') ||
+      spec.name.includes('history') ||
+      spec.name === 'stacks_sbtc_get_balance' ||
+      spec.name === 'stacks_zest_position'
+    ) {
       throw new Error(
         'No wallet address configured. Set STACKS_SENDER_KEY or STACKS_WALLET_ADDRESS in .env.'
       );
+    }
+  }
+
+  if (
+    'stacksAddress' in enriched ||
+    spec.name.includes('sbtc_build_peg') ||
+    spec.name.includes('sbtc_initiate_peg_in') ||
+    spec.name.includes('sbtc_get_peg_status')
+  ) {
+    const resolved = resolveStacksAddress(enriched.stacksAddress as string | undefined);
+    if (resolved) {
+      enriched.stacksAddress = resolved;
+    } else if (
+      spec.name.includes('sbtc_build_peg') ||
+      spec.name.includes('sbtc_initiate_peg_in')
+    ) {
+      const fallback = resolveStacksAddress(undefined);
+      if (fallback) {
+        enriched.stacksAddress = fallback;
+      } else if (spec.name.includes('sbtc_build_peg')) {
+        throw new Error(
+          'stacksAddress is required. Set STACKS_SENDER_KEY or pass stacksAddress explicitly.'
+        );
+      }
+    }
+  }
+
+  if (spec.name === 'stacks_sbtc_initiate_peg_in' && !enriched.senderKey && wallet.hasSenderKey) {
+    enriched.senderKey = process.env.STACKS_SENDER_KEY;
+  }
+
+  if (spec.name === 'stacks_send_sbtc') {
+    const walletAddr = wallet.address;
+    const recipient = resolveStacksAddress(enriched.recipient as string | undefined);
+    if (recipient) {
+      enriched.recipient = recipient;
+    }
+    if (walletAddr && recipient === walletAddr) {
+      throw new Error(
+        'Recipient cannot equal sender: sBTC self-transfers fail post-conditions (SentEq 0). Use a different Stacks address.'
+      );
+    }
+    if (!enriched.recipient) {
+      throw new Error('recipient is required for stacks_send_sbtc.');
     }
   }
 
@@ -126,17 +187,21 @@ function defaultFormatResult(spec: ToolActionSpec, result: unknown): string {
   }
 
   if (spec.name === 'stacks_send_tokens' && result && typeof result === 'object') {
-    const r = result as { success?: boolean; txid?: string; error?: string; reason?: string };
-    if (r.success && r.txid) {
-      const net = getStacksWalletConfig().network;
-      const id = r.txid.startsWith('0x') ? r.txid.slice(2) : r.txid;
-      const explorer =
-        net === 'mainnet'
-          ? `https://explorer.hiro.so/txid/${id}`
-          : `https://explorer.hiro.so/txid/${id}?chain=testnet`;
-      return `Transfer submitted successfully.\nTxID: ${r.txid}\nExplorer: ${explorer}`;
-    }
-    return `Transfer failed: ${r.error ?? 'unknown'}${r.reason ? ` (${r.reason})` : ''}`;
+    return formatBroadcastResult(result, getStacksWalletConfig().network, 'STX transfer');
+  }
+
+  if (spec.name === 'stacks_sbtc_get_balance' && result && typeof result === 'object') {
+    return formatSbtcBalanceResult(result);
+  }
+
+  if (BROADCAST_RESULT_TOOLS.has(spec.name) && result && typeof result === 'object') {
+    const label =
+      spec.name === 'stacks_send_sbtc'
+        ? 'sBTC transfer'
+        : spec.name.startsWith('stacks_zest_')
+          ? 'Zest transaction'
+          : 'Transaction';
+    return formatBroadcastResult(result, getStacksWalletConfig().network, label);
   }
 
   if (spec.name === 'stacks_get_account_history' && result && typeof result === 'object') {

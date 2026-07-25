@@ -5,6 +5,7 @@ exports.sendTokens = sendTokens;
 exports.getAccountHistory = getAccountHistory;
 const transactions_1 = require("@stacks/transactions");
 const client_1 = require("../client");
+/** Fetch the STX, fungible, and non-fungible token balances for an account. */
 async function getBalance(params) {
     const network = (0, client_1.resolveNetwork)(params.network);
     const url = `${(0, client_1.apiUrl)(network)}/extended/v1/address/${params.address}/balances`;
@@ -32,6 +33,7 @@ async function getBalance(params) {
         nonFungibleTokens,
     };
 }
+/** Build, sign, and broadcast an STX transfer. Returns the resulting txid. */
 async function sendTokens(params) {
     const network = (0, client_1.resolveNetwork)(params.network);
     const txOptions = {
@@ -40,9 +42,11 @@ async function sendTokens(params) {
         senderKey: params.senderKey,
         network,
         memo: params.memo,
-        fee: params.fee != null ? BigInt(params.fee) : undefined,
-        nonce: params.nonce != null ? BigInt(params.nonce) : undefined,
     };
+    if (params.fee != null)
+        txOptions.fee = BigInt(params.fee);
+    if (params.nonce != null)
+        txOptions.nonce = BigInt(params.nonce);
     const transaction = await (0, transactions_1.makeSTXTokenTransfer)(txOptions);
     const result = await (0, transactions_1.broadcastTransaction)({ transaction, network });
     if ('error' in result) {
@@ -51,6 +55,7 @@ async function sendTokens(params) {
     }
     return { txid: result.txid, success: true };
 }
+/** Fetch paginated transaction history for an account. */
 async function getAccountHistory(params) {
     const network = (0, client_1.resolveNetwork)(params.network);
     const limit = Math.min(params.limit ?? 20, 50);
@@ -71,4 +76,3 @@ async function getAccountHistory(params) {
         transactions: json.results ?? [],
     };
 }
-//# sourceMappingURL=account.js.map

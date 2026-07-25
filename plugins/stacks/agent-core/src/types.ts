@@ -235,3 +235,141 @@ export interface BridgeInitiateParams extends SignedParams {
   /** Recipient address on the destination chain. */
   recipient: string;
 }
+
+export interface SbtcGetBalanceParams extends BaseParams {
+  address: string;
+}
+
+export interface SbtcGetBalanceResult {
+  address: string;
+  network: NetworkArg;
+  /** sBTC balance in base units (8 decimals). */
+  sbtc: string;
+}
+
+export interface SendSbtcParams extends SignedParams {
+  recipient: string;
+  amount: string | number;
+  memo?: string;
+}
+
+export interface SbtcBuildPegInParams extends BaseParams {
+  stacksAddress: string;
+  maxSignerFee?: number;
+  reclaimLockTime?: number;
+  reclaimPublicKey?: string;
+  bitcoinPrivateKey?: string;
+}
+
+export interface SbtcBuildPegInResult {
+  network: NetworkArg;
+  stacksAddress: string;
+  depositAddress: string;
+  depositScript: string;
+  reclaimScript: string;
+  signersPublicKey: string;
+  maxSignerFee: number;
+  reclaimLockTime: number;
+}
+
+export interface SbtcInitiatePegInParams extends BaseParams {
+  amount: string | number;
+  stacksAddress?: string;
+  senderKey?: string;
+  bitcoinAddress?: string;
+  bitcoinPrivateKey?: string;
+  maxSignerFee?: number;
+  reclaimLockTime?: number;
+  feeRate?: number;
+}
+
+export interface SbtcInitiatePegInResult {
+  success: boolean;
+  network: NetworkArg;
+  stacksAddress: string;
+  bitcoinTxid: string;
+  depositAddress: string;
+  emilyStatus: string;
+  emilyMessage: string;
+  notify: unknown;
+}
+
+export interface SbtcInitiatePegOutParams extends SignedParams {
+  amount: string | number;
+  bitcoinRecipient: string;
+  maxFee?: string | number;
+  maxSignerFee?: string | number;
+}
+
+export interface SbtcGetPegStatusParams extends BaseParams {
+  bitcoinTxid?: string;
+  vout?: number;
+  stacksAddress?: string;
+}
+
+export interface SbtcGetPegStatusResult {
+  kind: 'deposit' | 'withdrawals';
+  network: NetworkArg;
+  deposit?: unknown;
+  stacksAddress?: string;
+  withdrawals?: unknown;
+}
+
+export interface ZestSbtcVaultInfoParams extends BaseParams {}
+
+export interface ZestSbtcVaultInfoResult {
+  network: NetworkArg;
+  contract: string;
+  utilization: unknown;
+  interestRateBps: unknown;
+  availableAssets: unknown;
+}
+
+export interface ZestProtocolStatusParams extends BaseParams {}
+
+export interface ZestProtocolStatusResult {
+  network: NetworkArg;
+  contract: string;
+  pauseStates: unknown;
+}
+
+export interface ZestSupplySbtcParams extends SignedParams {
+  amount: string | number;
+  minOut?: string | number;
+  recipient?: string;
+}
+
+export interface ZestRedeemSbtcParams extends SignedParams {
+  shares: string | number;
+  minUnderlying?: string | number;
+  recipient?: string;
+}
+
+export interface ZestPositionParams extends BaseParams {
+  address: string;
+}
+
+export interface ZestPositionResult {
+  network: NetworkArg;
+  address: string;
+  position: unknown;
+}
+
+export interface ZestCollateralAddSbtcParams extends SignedParams {
+  amount: string | number;
+  assetContract?: string;
+  priceFeedsHex?: string[];
+}
+
+export interface ZestBorrowParams extends SignedParams {
+  assetContract: string;
+  amount: string | number;
+  receiver?: string;
+  priceFeedsHex?: string[];
+}
+
+export interface ZestRepayParams extends SignedParams {
+  assetContract: string;
+  amount: string | number;
+  priceFeedsHex?: string[];
+}

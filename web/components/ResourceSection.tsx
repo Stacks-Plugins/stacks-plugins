@@ -1,4 +1,4 @@
-import { docsUrl, RESOURCES } from "@/lib/content";
+import { docsUrl, githubBlobUrl, githubTreeUrl, RESOURCES } from "@/lib/content";
 import { ResourceItem } from "./ResourceItem";
 
 export function ResourceSection() {
@@ -10,7 +10,7 @@ export function ResourceSection() {
             Resources
           </span>
           <p className="mt-6 text-lg leading-relaxed text-stacks-black/80 lg:text-xl">
-            Guides and references for building Stacks AI agents — whether you use ElizaOS,
+            Guides and references for building Stacks AI agents. Whether you use ElizaOS,
             OpenClaw, or Hermes, you will find setup instructions, tool docs, and architecture
             notes here.
           </p>
@@ -18,17 +18,22 @@ export function ResourceSection() {
 
         <ul className="flex flex-col gap-2">
           {RESOURCES.map((resource) => {
-            const href = resource.externalHref ?? docsUrl(resource.docsPath);
-            const external = Boolean(resource.externalHref);
+            const docsHref = resource.externalHref ?? docsUrl(resource.docsPath);
+            const githubHref = resource.githubPath
+              ? resource.githubBlob
+                ? githubBlobUrl(resource.githubPath)
+                : githubTreeUrl(resource.githubPath)
+              : undefined;
 
             return (
               <li key={resource.title}>
                 <ResourceItem
                   title={resource.title}
                   description={resource.description}
-                  href={href}
+                  docsHref={docsHref}
                   color={resource.color}
-                  external={external}
+                  githubHref={githubHref}
+                  githubLabel={resource.githubLabel}
                 />
               </li>
             );

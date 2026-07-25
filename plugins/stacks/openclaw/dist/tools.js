@@ -1,5 +1,5 @@
 import { Type } from 'typebox';
-import { bridgeInitiate, bridgeQuote, canStack, contractCall, decodeCv, delegateStx, getAccountHistory, getBalance, getNamePrice, getStackingStatus, lookupAddress, readOnlyCall, resolveName, revokeDelegate, sendTokens, stack, swapExecute, swapQuote, transferName, } from '@sugarhi11/agent-core';
+import { bridgeInitiate, bridgeQuote, canStack, contractCall, decodeCv, delegateStx, getAccountHistory, getBalance, getNamePrice, getStackingStatus, lookupAddress, readOnlyCall, resolveName, revokeDelegate, sbtcBuildPegIn, sbtcGetBalance, sbtcGetPegStatus, sbtcInitiatePegIn, sbtcInitiatePegOut, sendSbtc, sendTokens, stack, swapExecute, swapQuote, transferName, zestBorrow, zestCollateralAddSbtc, zestPosition, zestProtocolStatus, zestRedeemSbtc, zestRepay, zestSbtcVaultInfo, zestSupplySbtc, } from '@sugarhi11/agent-core';
 const Network = Type.Optional(Type.Union([Type.Literal('mainnet'), Type.Literal('testnet')], {
     description: 'Target network. Defaults to STACKS_NETWORK env or plugin config.',
 }));
@@ -247,6 +247,189 @@ export const stacksToolSpecs = [
             network: Network,
         }),
         handler: bridgeInitiate,
+        signed: true,
+        optional: true,
+    },
+    {
+        name: 'stacks_sbtc_get_balance',
+        description: 'Get sBTC balance for a Stacks address (8-decimal base units). Omit `address` for the agent wallet. ' +
+            'Params: { address?: string, network? }.',
+        parameters: Type.Object({
+            address: Type.Optional(Type.String()),
+            network: Network,
+        }),
+        handler: sbtcGetBalance,
+    },
+    {
+        name: 'stacks_send_sbtc',
+        description: 'Transfer sBTC on Stacks via sbtc-token SIP-010. Recipient must differ from sender (no self-transfers). Confirm recipient and amount. senderKey auto-injected. ' +
+            'Params: { recipient, amount, memo?, network? }.',
+        parameters: Type.Object({
+            recipient: Type.String(),
+            amount: Amount,
+            memo: Type.Optional(Type.String()),
+            fee: Type.Optional(Amount),
+            nonce: Type.Optional(Amount),
+            network: Network,
+        }),
+        handler: sendSbtc,
+        signed: true,
+        optional: true,
+    },
+    {
+        name: 'stacks_sbtc_build_peg_in',
+        description: 'Build sBTC peg-in deposit address and scripts without broadcasting Bitcoin. ' +
+            'Params: { stacksAddress?, maxSignerFee?, reclaimLockTime?, network? }.',
+        parameters: Type.Object({
+            stacksAddress: Type.Optional(Type.String()),
+            maxSignerFee: Type.Optional(Type.Number()),
+            reclaimLockTime: Type.Optional(Type.Number()),
+            network: Network,
+        }),
+        handler: sbtcBuildPegIn,
+    },
+    {
+        name: 'stacks_sbtc_initiate_peg_in',
+        description: 'Peg BTC into sBTC: broadcast Bitcoin deposit and notify Emily. Requires BITCOIN_PRIVATE_KEY and BITCOIN_ADDRESS. ' +
+            'Params: { amount, stacksAddress?, feeRate?, maxSignerFee?, network? }.',
+        parameters: Type.Object({
+            amount: Amount,
+            stacksAddress: Type.Optional(Type.String()),
+            feeRate: Type.Optional(Type.Number()),
+            maxSignerFee: Type.Optional(Type.Number()),
+            reclaimLockTime: Type.Optional(Type.Number()),
+            network: Network,
+        }),
+        handler: sbtcInitiatePegIn,
+        optional: true,
+    },
+    {
+        name: 'stacks_sbtc_initiate_peg_out',
+        description: 'Initiate sBTC peg-out (withdraw sBTC for BTC). senderKey auto-injected. ' +
+            'Params: { amount, bitcoinRecipient, maxFee?, network? }.',
+        parameters: Type.Object({
+            amount: Amount,
+            bitcoinRecipient: Type.String(),
+            maxFee: Type.Optional(Amount),
+            fee: Type.Optional(Amount),
+            nonce: Type.Optional(Amount),
+            network: Network,
+        }),
+        handler: sbtcInitiatePegOut,
+        signed: true,
+        optional: true,
+    },
+    {
+        name: 'stacks_sbtc_get_peg_status',
+        description: 'Query Emily for peg-in deposit (bitcoinTxid) or peg-out withdrawals (stacksAddress). ' +
+            'Params: { bitcoinTxid?, vout?, stacksAddress?, network? }.',
+        parameters: Type.Object({
+            bitcoinTxid: Type.Optional(Type.String()),
+            vout: Type.Optional(Type.Number()),
+            stacksAddress: Type.Optional(Type.String()),
+            network: Network,
+        }),
+        handler: sbtcGetPegStatus,
+    },
+    {
+        name: 'stacks_zest_sbtc_vault_info',
+        description: 'Read Zest vault-sbtc utilization, borrow APR, and available liquidity. Params: { network? }.',
+        parameters: Type.Object({ network: Network }),
+        handler: zestSbtcVaultInfo,
+    },
+    {
+        name: 'stacks_zest_protocol_status',
+        description: 'Read Zest vault pause flags before attempting writes. Params: { network? }.',
+        parameters: Type.Object({ network: Network }),
+        handler: zestProtocolStatus,
+    },
+    {
+        name: 'stacks_zest_supply_sbtc',
+        description: 'Supply sBTC to Zest vault-sbtc for yield (receive zsBTC). Check pause state first. senderKey auto-injected. ' +
+            'Params: { amount, minOut?, recipient?, network? }.',
+        parameters: Type.Object({
+            amount: Amount,
+            minOut: Type.Optional(Amount),
+            recipient: Type.Optional(Type.String()),
+            fee: Type.Optional(Amount),
+            nonce: Type.Optional(Amount),
+            network: Network,
+        }),
+        handler: zestSupplySbtc,
+        signed: true,
+        optional: true,
+    },
+    {
+        name: 'stacks_zest_redeem_sbtc',
+        description: 'Redeem zsBTC shares from Zest vault-sbtc. senderKey auto-injected. ' +
+            'Params: { shares, minUnderlying?, recipient?, network? }.',
+        parameters: Type.Object({
+            shares: Amount,
+            minUnderlying: Type.Optional(Amount),
+            recipient: Type.Optional(Type.String()),
+            fee: Type.Optional(Amount),
+            nonce: Type.Optional(Amount),
+            network: Network,
+        }),
+        handler: zestRedeemSbtc,
+        signed: true,
+        optional: true,
+    },
+    {
+        name: 'stacks_zest_position',
+        description: 'Read Zest market position (collateral and debt) for a Stacks address. Params: { address?, network? }.',
+        parameters: Type.Object({
+            address: Type.Optional(Type.String()),
+            network: Network,
+        }),
+        handler: zestPosition,
+    },
+    {
+        name: 'stacks_zest_collateral_add_sbtc',
+        description: 'Post sBTC as Zest market collateral. senderKey auto-injected. ' +
+            'Params: { amount, assetContract?, priceFeedsHex?, network? }.',
+        parameters: Type.Object({
+            amount: Amount,
+            assetContract: Type.Optional(Type.String()),
+            priceFeedsHex: Type.Optional(Type.Array(Type.String())),
+            fee: Type.Optional(Amount),
+            nonce: Type.Optional(Amount),
+            network: Network,
+        }),
+        handler: zestCollateralAddSbtc,
+        signed: true,
+        optional: true,
+    },
+    {
+        name: 'stacks_zest_borrow',
+        description: 'Borrow from Zest market against collateral. senderKey auto-injected. ' +
+            'Params: { assetContract, amount, receiver?, priceFeedsHex?, network? }.',
+        parameters: Type.Object({
+            assetContract: Type.String(),
+            amount: Amount,
+            receiver: Type.Optional(Type.String()),
+            priceFeedsHex: Type.Optional(Type.Array(Type.String())),
+            fee: Type.Optional(Amount),
+            nonce: Type.Optional(Amount),
+            network: Network,
+        }),
+        handler: zestBorrow,
+        signed: true,
+        optional: true,
+    },
+    {
+        name: 'stacks_zest_repay',
+        description: 'Repay Zest market debt. senderKey auto-injected. ' +
+            'Params: { assetContract, amount, priceFeedsHex?, network? }.',
+        parameters: Type.Object({
+            assetContract: Type.String(),
+            amount: Amount,
+            priceFeedsHex: Type.Optional(Type.Array(Type.String())),
+            fee: Type.Optional(Amount),
+            nonce: Type.Optional(Amount),
+            network: Network,
+        }),
+        handler: zestRepay,
         signed: true,
         optional: true,
     },

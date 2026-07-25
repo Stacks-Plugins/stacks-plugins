@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "@scure/bip39": "^1.5.0",
-    "@sugarhi11/agent-core": "^0.1.0",
+    "@stacks/transactions": "^7.4.0",
+    "@sugarhi11/agent-core": "0.2.0",
     "typebox": "^1.1.38"
   },
   "peerDependencies": {
