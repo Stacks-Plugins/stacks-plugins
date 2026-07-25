@@ -5,5 +5,5 @@ declare const _default: import("eve/tools").ToolDefinition<{
     functionArgsHex?: string[] | undefined;
     senderAddress?: string | undefined;
     network?: "mainnet" | "testnet" | undefined;
-}, import("@stacks/agent-core").ReadOnlyCallResult>;
+}, import("@sugarhi11/agent-core").ReadOnlyCallResult>;
 export default _default;

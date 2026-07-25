@@ -5,12 +5,13 @@ type FrameworkCardProps = {
   title: string;
   description: string;
   packageName: string;
-  docsHref: string;
+  docsHref?: string;
   githubHref: string;
   logoSrc: string;
   logoWidth: number;
   logoHeight: number;
   logoClassName?: string;
+  underDevelopment?: boolean;
   isLast?: boolean;
 };
 
@@ -25,6 +26,7 @@ export function FrameworkCard({
   logoWidth,
   logoHeight,
   logoClassName,
+  underDevelopment,
   isLast,
 }: FrameworkCardProps) {
   const isSquare = Math.abs(logoWidth - logoHeight) / logoHeight < 0.15;
@@ -35,7 +37,14 @@ export function FrameworkCard({
         !isLast ? "border-b border-white/20 md:border-b-0 md:border-r" : ""
       }`}
     >
-      <span className="text-5xl font-light text-white/90 lg:text-6xl">{number}</span>
+      <div className="flex items-start justify-between gap-3">
+        <span className="text-5xl font-light text-white/90 lg:text-6xl">{number}</span>
+        {underDevelopment ? (
+          <span className="mt-2 shrink-0 border border-white/35 bg-white/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/90">
+            Under development
+          </span>
+        ) : null}
+      </div>
       <div className="mt-6 flex h-10 items-center">
         <Image
           src={logoSrc}
@@ -62,15 +71,21 @@ export function FrameworkCard({
       </a>
       <p className="mt-4 flex-1 text-sm leading-relaxed text-white/80 lg:text-base">{description}</p>
       <div className="mt-8 flex flex-wrap gap-3">
-        <a
-          href={docsHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-pill btn-pill-white w-fit text-xs uppercase tracking-wide"
-        >
-          Get started
-          <span aria-hidden>→</span>
-        </a>
+        {underDevelopment ? (
+          <span className="btn-pill w-fit cursor-default border border-white/20 bg-white/10 text-xs uppercase tracking-wide text-white/70">
+            Coming soon
+          </span>
+        ) : docsHref ? (
+          <a
+            href={docsHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-pill btn-pill-white w-fit text-xs uppercase tracking-wide"
+          >
+            Get started
+            <span aria-hidden>→</span>
+          </a>
+        ) : null}
         <a
           href={githubHref}
           target="_blank"

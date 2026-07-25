@@ -6,7 +6,7 @@ __eveCreateRequire(import.meta.url);
 import { runStacksTool } from "../lib/execute.mjs";
 import { signedFieldsSchema } from "../lib/schemas.mjs";
 import { z } from "zod";
-import { transferName } from "@stacks/agent-core";
+import { transferName } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 import { always } from "eve/tools/approval";
 var transfer_name_default = defineTool({

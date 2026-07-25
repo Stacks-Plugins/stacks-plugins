@@ -6,7 +6,7 @@ __eveCreateRequire(import.meta.url);
 import { runStacksTool } from "../lib/execute.mjs";
 import { networkSchema } from "../lib/schemas.mjs";
 import { z } from "zod";
-import { resolveName } from "@stacks/agent-core";
+import { resolveName } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 var resolve_name_default = defineTool({
 	description: "Resolve a BNS name to its owner address and zonefile.",

@@ -6,7 +6,7 @@ __eveCreateRequire(import.meta.url);
 import { runStacksTool } from "../lib/execute.mjs";
 import { amountSchema, networkSchema } from "../lib/schemas.mjs";
 import { z } from "zod";
-import { canStack } from "@stacks/agent-core";
+import { canStack } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 var can_stack_default = defineTool({
 	description: "Check whether an address is eligible to stack a given amount and cycle count.",

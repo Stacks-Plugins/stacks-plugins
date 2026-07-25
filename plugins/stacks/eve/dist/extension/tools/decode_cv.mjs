@@ -4,7 +4,7 @@ import { createRequire as __eveCreateRequire } from "node:module";
 __eveDirname(__eveFileURLToPath(import.meta.url));
 __eveCreateRequire(import.meta.url);
 import { z } from "zod";
-import { decodeCv } from "@stacks/agent-core";
+import { decodeCv } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 var decode_cv_default = defineTool({
 	description: "Decode a hex-encoded serialized Clarity value into readable JSON.",

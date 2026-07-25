@@ -6,7 +6,7 @@ __eveCreateRequire(import.meta.url);
 import { runStacksTool } from "../lib/execute.mjs";
 import { networkSchema } from "../lib/schemas.mjs";
 import { z } from "zod";
-import { getAccountHistory } from "@stacks/agent-core";
+import { getAccountHistory } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 var get_account_history_default = defineTool({
 	description: "Get paginated transaction history for a Stacks address.",

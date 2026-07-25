@@ -1,4 +1,4 @@
-import { lookupAddress } from "@stacks/agent-core";
+import { lookupAddress } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 import { z } from "zod";
 

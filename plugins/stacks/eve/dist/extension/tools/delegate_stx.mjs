@@ -6,7 +6,7 @@ __eveCreateRequire(import.meta.url);
 import { runStacksTool } from "../lib/execute.mjs";
 import { amountSchema, signedFieldsSchema } from "../lib/schemas.mjs";
 import { z } from "zod";
-import { delegateStx } from "@stacks/agent-core";
+import { delegateStx } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 import { always } from "eve/tools/approval";
 var delegate_stx_default = defineTool({

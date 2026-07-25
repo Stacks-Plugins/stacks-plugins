@@ -1,7 +1,7 @@
 import type { Action } from '@elizaos/core';
 export type ToolHandler = (params: any) => Promise<any> | any;
 export interface ToolActionSpec {
-    /** Tool id from @stacks/agent-core, e.g. `stacks_get_balance`. */
+    /** Tool id from @sugarhi11/agent-core, e.g. `stacks_get_balance`. */
     name: string;
     /** Natural-language description shown to the model. */
     description: string;
@@ -13,7 +13,7 @@ export interface ToolActionSpec {
     examples?: any[];
 }
 /**
- * Convert a single @stacks/agent-core tool into an ElizaOS {@link Action}.
+ * Convert a single @sugarhi11/agent-core tool into an ElizaOS {@link Action}.
  * This keeps every adapter a thin shim over the shared implementation.
  */
 export declare function makeAction(spec: ToolActionSpec): Action;

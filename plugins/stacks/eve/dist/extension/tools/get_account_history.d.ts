@@ -3,5 +3,5 @@ declare const _default: import("eve/tools").ToolDefinition<{
     limit?: number | undefined;
     offset?: number | undefined;
     network?: "mainnet" | "testnet" | undefined;
-}, import("@stacks/agent-core").AccountHistoryResult>;
+}, import("@sugarhi11/agent-core").AccountHistoryResult>;
 export default _default;

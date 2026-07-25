@@ -20,7 +20,7 @@ import {
   swapExecute,
   swapQuote,
   transferName,
-} from '@stacks/agent-core';
+} from '@sugarhi11/agent-core';
 
 const Network = Type.Optional(
   Type.Union([Type.Literal('mainnet'), Type.Literal('testnet')], {

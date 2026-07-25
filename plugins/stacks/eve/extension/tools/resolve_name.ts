@@ -1,4 +1,4 @@
-import { resolveName } from "@stacks/agent-core";
+import { resolveName } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 import { z } from "zod";
 

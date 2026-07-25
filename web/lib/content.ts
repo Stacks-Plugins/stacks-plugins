@@ -4,8 +4,8 @@ export const SITE = {
     "AI agent plugins for the Stacks blockchain covering balances, transfers, stacking, BNS, Clarity contracts, swaps, bridging, sBTC, and Zest yield.",
   githubUrl: "https://github.com/Stacks-Plugins/stacks-plugins",
   githubBranch: "main",
-  youtubeUrl: "https://youtu.be/ccCIxig72xA",
-  youtubeEmbedUrl: "https://www.youtube.com/embed/ccCIxig72xA",
+  youtubeUrl: "https://youtu.be/7stbxXrjzh4",
+  youtubeEmbedUrl: "https://www.youtube.com/embed/7stbxXrjzh4",
 } as const;
 
 export function githubTreeUrl(path: string): string {
@@ -38,12 +38,14 @@ export type Framework = {
   package: string;
   title: string;
   description: string;
-  docsPath: string;
+  docsPath?: string;
   githubPath: string;
   logoSrc: string;
   logoWidth: number;
   logoHeight: number;
   logoClassName?: string;
+  /** When true, the card is shown as work-in-progress (no docs CTA). */
+  underDevelopment?: boolean;
 };
 
 export const FRAMEWORKS: Framework[] = [
@@ -86,6 +88,19 @@ export const FRAMEWORKS: Framework[] = [
     logoWidth: 500,
     logoHeight: 500,
     logoClassName: "brightness-0 invert",
+  },
+  {
+    number: 4,
+    name: "eve",
+    package: "@stacks/eve-stacks",
+    title: "Mount the eve extension",
+    description:
+      "eve extension that exposes Stacks tools via defineExtension and defineTool — balances, transfers, stacking, BNS, contracts, and swaps. This adapter is under development; APIs and packaging may still change.",
+    githubPath: "plugins/stacks/eve",
+    logoSrc: "/logos/eve.svg",
+    logoWidth: 120,
+    logoHeight: 40,
+    underDevelopment: true,
   },
 ];
 
@@ -141,7 +156,7 @@ export const RESOURCES: Resource[] = [
   },
   {
     title: "Agent core",
-    description: "Use @stacks/agent-core directly or build a custom framework adapter.",
+    description: "Use @sugarhi11/agent-core directly or build a custom framework adapter.",
     docsPath: "/agent-core/overview",
     githubPath: "plugins/stacks/agent-core",
     githubLabel: "plugins/stacks/agent-core",

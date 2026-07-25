@@ -6,7 +6,7 @@ __eveCreateRequire(import.meta.url);
 import { runStacksTool } from "../lib/execute.mjs";
 import { amountSchema, networkSchema } from "../lib/schemas.mjs";
 import { z } from "zod";
-import { swapQuote } from "@stacks/agent-core";
+import { swapQuote } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 var swap_quote_default = defineTool({
 	description: "Get a token swap quote from the ALEX DEX (mainnet).",

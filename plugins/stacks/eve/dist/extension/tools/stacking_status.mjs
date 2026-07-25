@@ -6,7 +6,7 @@ __eveCreateRequire(import.meta.url);
 import { runStacksTool } from "../lib/execute.mjs";
 import { networkSchema } from "../lib/schemas.mjs";
 import { z } from "zod";
-import { getStackingStatus } from "@stacks/agent-core";
+import { getStackingStatus } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 var stacking_status_default = defineTool({
 	description: "Get the current stacking (PoX) lock and delegation status for an address.",

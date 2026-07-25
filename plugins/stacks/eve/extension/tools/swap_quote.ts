@@ -1,4 +1,4 @@
-import { swapQuote } from "@stacks/agent-core";
+import { swapQuote } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 import { z } from "zod";
 

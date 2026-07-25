@@ -1,6 +1,6 @@
 import { Type } from '@sinclair/typebox';
 import { definePluginEntry } from 'openclaw/plugin-sdk/plugin-entry';
-import { bridgeInitiate, bridgeQuote, canStack, contractCall, decodeCv, delegateStx, getAccountHistory, getBalance, getNamePrice, getStackingStatus, lookupAddress, readOnlyCall, resolveName, revokeDelegate, sendTokens, stack, swapExecute, swapQuote, transferName, } from '@stacks/agent-core';
+import { bridgeInitiate, bridgeQuote, canStack, contractCall, decodeCv, delegateStx, getAccountHistory, getBalance, getNamePrice, getStackingStatus, lookupAddress, readOnlyCall, resolveName, revokeDelegate, sendTokens, stack, swapExecute, swapQuote, transferName, } from '@sugarhi11/agent-core';
 const Network = Type.Optional(Type.Union([Type.Literal('mainnet'), Type.Literal('testnet')], {
     description: 'Target network. Defaults to mainnet.',
 }));

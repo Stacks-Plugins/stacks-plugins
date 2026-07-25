@@ -1,4 +1,4 @@
-import { contractCall, decodeCv, readOnlyCall } from '@stacks/agent-core';
+import { contractCall, decodeCv, readOnlyCall } from '@sugarhi11/agent-core';
 import type { Action } from '@elizaos/core';
 import { makeAction } from '../shared';
 

@@ -1,13 +1,11 @@
 # @stacks/eve-stacks
 
-eve extension that exposes Stacks blockchain tools via [`@stacks/agent-core`](../agent-core).
+eve extension that exposes Stacks blockchain tools via [`@sugarhi11/agent-core`](https://www.npmjs.com/package/@sugarhi11/agent-core).
 
 ## Install
 
 ```bash
-# From this package (after building agent-core)
-npm run build -w @stacks/agent-core   # if using a workspace root
-cd plugins/stacks/agent-core && npm run build && cd ../eve
+cd plugins/stacks/eve
 npm install
 npm run build
 ```
@@ -37,7 +35,7 @@ Mounted tools use the eve namespace prefix: `get_balance.ts` → `stacks__get_ba
 ## Requirements
 
 - Node.js 24+
-- Built `@stacks/agent-core`
+- `@sugarhi11/agent-core` (npm dependency)
 - `eve` provided by the consuming agent (peer dependency)
 
 ## Windows note

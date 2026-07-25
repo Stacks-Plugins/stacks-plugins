@@ -4,7 +4,7 @@ All Stacks agent integrations live in this directory.
 
 ```
 plugins/stacks/
-├── agent-core/     @stacks/agent-core — shared TypeScript tool implementations
+├── agent-core/     @sugarhi11/agent-core — shared TypeScript tool implementations
 ├── eliza/          ElizaOS plugin (actions)
 ├── openclaw/       OpenClaw plugin (registerTool + manifest)
 ├── hermes/         Hermes plugin (Python + Node write bridge)

@@ -1,4 +1,4 @@
-import { bridgeQuote } from "@stacks/agent-core";
+import { bridgeQuote } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 import { z } from "zod";
 

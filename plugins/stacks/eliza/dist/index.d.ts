@@ -7,7 +7,7 @@ import { swapActions } from './actions/swapActions';
 /**
  * ElizaOS plugin exposing the full Stacks agent toolset.
  *
- * All blockchain logic lives in `@stacks/agent-core`; this package only adapts
+ * All blockchain logic lives in `@sugarhi11/agent-core`; this package only adapts
  * those handlers into ElizaOS {@link Action}s so the same implementation is
  * shared with the OpenClaw plugin.
  */
