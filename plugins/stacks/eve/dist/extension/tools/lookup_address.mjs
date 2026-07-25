@@ -6,7 +6,7 @@ __eveCreateRequire(import.meta.url);
 import { runStacksTool } from "../lib/execute.mjs";
 import { networkSchema } from "../lib/schemas.mjs";
 import { z } from "zod";
-import { lookupAddress } from "@stacks/agent-core";
+import { lookupAddress } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 var lookup_address_default = defineTool({
 	description: "List all BNS names owned by a Stacks address.",

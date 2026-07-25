@@ -1,4 +1,4 @@
-import { getAccountHistory, getBalance, sendTokens } from '@stacks/agent-core';
+import { getAccountHistory, getBalance, sendTokens } from '@sugarhi11/agent-core';
 import type { Action } from '@elizaos/core';
 import { makeAction } from '../shared';
 

@@ -6,7 +6,7 @@ __eveCreateRequire(import.meta.url);
 import { runStacksTool } from "../lib/execute.mjs";
 import { networkSchema } from "../lib/schemas.mjs";
 import { z } from "zod";
-import { getBalance } from "@stacks/agent-core";
+import { getBalance } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 var get_balance_default = defineTool({
 	description: "Get STX, fungible, and non-fungible token balances for a Stacks address.",

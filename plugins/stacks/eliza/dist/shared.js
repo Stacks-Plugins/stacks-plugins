@@ -14,7 +14,7 @@ function resolveParams(message, options) {
     return content.params ?? content;
 }
 /**
- * Convert a single @stacks/agent-core tool into an ElizaOS {@link Action}.
+ * Convert a single @sugarhi11/agent-core tool into an ElizaOS {@link Action}.
  * This keeps every adapter a thin shim over the shared implementation.
  */
 function makeAction(spec) {

@@ -6,7 +6,7 @@ __eveCreateRequire(import.meta.url);
 import { runStacksTool } from "../lib/execute.mjs";
 import { hexArgsSchema, networkSchema } from "../lib/schemas.mjs";
 import { z } from "zod";
-import { readOnlyCall } from "@stacks/agent-core";
+import { readOnlyCall } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 var read_only_call_default = defineTool({
 	description: "Evaluate a read-only Clarity contract function and return decoded JSON.",

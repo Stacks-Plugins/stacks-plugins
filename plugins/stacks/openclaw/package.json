@@ -1,7 +1,7 @@
 {
   "name": "@stacks/openclaw-stacks",
   "version": "0.1.0",
-  "description": "OpenClaw plugin exposing Stacks blockchain tools (balance, transfers, stacking, BNS, contracts, swaps) via @stacks/agent-core.",
+  "description": "OpenClaw plugin exposing Stacks blockchain tools (balance, transfers, stacking, BNS, contracts, swaps) via @sugarhi11/agent-core.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@stacks/agent-core": "0.1.0",
+    "@sugarhi11/agent-core": "^0.2.0",
     "@sinclair/typebox": "^0.34.0"
   },
   "peerDependencies": {

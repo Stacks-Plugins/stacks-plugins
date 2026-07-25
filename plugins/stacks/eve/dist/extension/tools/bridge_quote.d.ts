@@ -4,5 +4,5 @@ declare const _default: import("eve/tools").ToolDefinition<{
     token: string;
     amount: string | number;
     network?: "mainnet" | "testnet" | undefined;
-}, import("@stacks/agent-core").BridgeQuoteResult>;
+}, import("@sugarhi11/agent-core").BridgeQuoteResult>;
 export default _default;

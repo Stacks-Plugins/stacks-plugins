@@ -1,4 +1,4 @@
-import { getBalance } from "@stacks/agent-core";
+import { getBalance } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 import { z } from "zod";
 

@@ -1,4 +1,4 @@
-import { decodeCv } from "@stacks/agent-core";
+import { decodeCv } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 import { z } from "zod";
 

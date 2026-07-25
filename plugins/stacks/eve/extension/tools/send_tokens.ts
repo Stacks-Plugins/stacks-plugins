@@ -1,4 +1,4 @@
-import { sendTokens } from "@stacks/agent-core";
+import { sendTokens } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 import { always } from "eve/tools/approval";
 import { z } from "zod";

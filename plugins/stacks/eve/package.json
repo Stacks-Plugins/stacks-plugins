@@ -1,7 +1,7 @@
 {
   "name": "@stacks/eve-stacks",
   "version": "0.1.0",
-  "description": "eve extension exposing Stacks blockchain tools (balance, transfers, stacking, BNS, contracts, swaps) via @stacks/agent-core.",
+  "description": "eve extension exposing Stacks blockchain tools (balance, transfers, stacking, BNS, contracts, swaps) via @sugarhi11/agent-core.",
   "type": "module",
   "license": "MIT",
   "eve": {
@@ -29,7 +29,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@stacks/agent-core": "file:../agent-core",
+    "@sugarhi11/agent-core": "^0.2.0",
     "zod": "^4.0.0"
   },
   "devDependencies": {

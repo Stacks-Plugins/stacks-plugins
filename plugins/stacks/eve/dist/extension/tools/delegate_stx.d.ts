@@ -7,5 +7,5 @@ declare const _default: import("eve/tools").ToolDefinition<{
     network?: "mainnet" | "testnet" | undefined;
     untilBurnBlockHeight?: number | undefined;
     poxAddress?: string | undefined;
-}, import("@stacks/agent-core").BroadcastResult>;
+}, import("@sugarhi11/agent-core").BroadcastResult>;
 export default _default;

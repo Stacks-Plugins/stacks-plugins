@@ -9,5 +9,5 @@ declare const _default: import("eve/tools").ToolDefinition<{
     network?: "mainnet" | "testnet" | undefined;
     functionArgsHex?: string[] | undefined;
     functionName?: string | undefined;
-}, import("@stacks/agent-core").BroadcastResult>;
+}, import("@sugarhi11/agent-core").BroadcastResult>;
 export default _default;

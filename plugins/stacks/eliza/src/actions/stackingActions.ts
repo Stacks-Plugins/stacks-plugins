@@ -4,7 +4,7 @@ import {
   getStackingStatus,
   revokeDelegate,
   stack,
-} from '@stacks/agent-core';
+} from '@sugarhi11/agent-core';
 import type { Action } from '@elizaos/core';
 import { makeAction } from '../shared';
 

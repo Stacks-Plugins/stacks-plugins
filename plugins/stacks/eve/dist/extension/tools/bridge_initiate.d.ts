@@ -8,5 +8,5 @@ declare const _default: import("eve/tools").ToolDefinition<{
     fee?: string | number | undefined;
     nonce?: string | number | undefined;
     network?: "mainnet" | "testnet" | undefined;
-}, import("@stacks/agent-core").BroadcastResult>;
+}, import("@sugarhi11/agent-core").BroadcastResult>;
 export default _default;

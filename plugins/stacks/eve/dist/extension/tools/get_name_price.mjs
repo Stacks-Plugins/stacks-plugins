@@ -6,7 +6,7 @@ __eveCreateRequire(import.meta.url);
 import { runStacksTool } from "../lib/execute.mjs";
 import { networkSchema } from "../lib/schemas.mjs";
 import { z } from "zod";
-import { getNamePrice } from "@stacks/agent-core";
+import { getNamePrice } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 var get_name_price_default = defineTool({
 	description: "Get the registration price (microSTX) for a BNS name.",

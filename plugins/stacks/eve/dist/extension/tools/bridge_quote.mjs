@@ -6,7 +6,7 @@ __eveCreateRequire(import.meta.url);
 import { runStacksTool } from "../lib/execute.mjs";
 import { amountSchema, networkSchema } from "../lib/schemas.mjs";
 import { z } from "zod";
-import { bridgeQuote } from "@stacks/agent-core";
+import { bridgeQuote } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 var bridge_quote_default = defineTool({
 	description: "Get a cross-chain bridge quote via Allbridge Core.",

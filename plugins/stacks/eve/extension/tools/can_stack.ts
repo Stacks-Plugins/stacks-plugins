@@ -1,4 +1,4 @@
-import { canStack } from "@stacks/agent-core";
+import { canStack } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 import { z } from "zod";
 

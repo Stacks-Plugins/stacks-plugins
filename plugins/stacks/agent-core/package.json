@@ -1,6 +1,6 @@
 {
-  "name": "@stacks/agent-core",
-  "version": "0.1.0",
+  "name": "@sugarhi11/agent-core",
+  "version": "0.2.0",
   "description": "Framework-agnostic Stacks blockchain tools for AI agents (balance, transactions, stacking, BNS, contracts, swaps, bridging).",
   "license": "MIT",
   "author": "Hiro Systems PBC (https://hiro.so)",

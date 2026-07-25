@@ -6,7 +6,7 @@ __eveCreateRequire(import.meta.url);
 import { runStacksTool } from "../lib/execute.mjs";
 import { amountSchema, signedFieldsSchema } from "../lib/schemas.mjs";
 import { z } from "zod";
-import { bridgeInitiate } from "@stacks/agent-core";
+import { bridgeInitiate } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 import { always } from "eve/tools/approval";
 var bridge_initiate_default = defineTool({

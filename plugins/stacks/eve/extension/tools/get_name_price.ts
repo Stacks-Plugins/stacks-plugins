@@ -1,4 +1,4 @@
-import { getNamePrice } from "@stacks/agent-core";
+import { getNamePrice } from "@sugarhi11/agent-core";
 import { defineTool } from "eve/tools";
 import { z } from "zod";
 

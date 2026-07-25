@@ -6,6 +6,26 @@ Documentation lives in [`docs/`](docs/) (Mintlify). Preview locally with `mintli
 
 The marketing landing page lives in [`web/`](web/). Run `npm run dev` from `web/` after setting `NEXT_PUBLIC_DOCS_URL`.
 
+## Plugins in action
+
+### ElizaOS
+
+Eliza plugin in action — StacksAgent querying an sBTC balance on testnet:
+
+![ElizaOS Stacks plugin checking sBTC balance](docs/images/eliza-sbtc-balance.png)
+
+### OpenClaw
+
+OpenClaw plugin in action — sending 0.1 sBTC on testnet:
+
+![OpenClaw Stacks plugin sending 0.1 sBTC](docs/images/openclaw-sbtc-send.png)
+
+### Hermes
+
+Hermes plugin in action — sending 0.1 sBTC on testnet:
+
+![Hermes agent sending 0.1 sBTC on testnet](docs/images/hermes-sbtc-send.png)
+
 ## Repository layout
 
 ```
